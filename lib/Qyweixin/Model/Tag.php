@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 标签构体
  */
-class Tag extends \QyWeixin\Model\Base
+class Tag extends \Qyweixin\Model\Base
 {
 
     /**

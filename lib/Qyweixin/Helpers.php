@@ -1,6 +1,6 @@
 <?php
 
-namespace QyWeixin;
+namespace Qyweixin;
 
 /**
  * Defines a few helper methods.

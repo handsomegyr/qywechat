@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 部门构体
  */
-class Department extends \QyWeixin\Model\Base
+class Department extends \Qyweixin\Model\Base
 {
 
     /**

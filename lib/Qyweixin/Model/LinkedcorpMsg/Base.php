@@ -5,7 +5,7 @@ namespace Qyweixin\Model\LinkedcorpMsg;
 /**
  * 消息类型构体
  */
-class Base extends \QyWeixin\Model\Base
+class Base extends \Qyweixin\Model\Base
 {
 
     /**

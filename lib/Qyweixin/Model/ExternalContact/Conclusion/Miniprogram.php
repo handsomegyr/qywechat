@@ -5,7 +5,7 @@ namespace Qyweixin\Model\ExternalContact\Conclusion;
 /**
  * 小程序消息构体
  */
-class Miniprogram extends \QyWeixin\Model\Base
+class Miniprogram extends \Qyweixin\Model\Base
 {
 
     /**

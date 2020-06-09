@@ -5,7 +5,7 @@ namespace Qyweixin\Model\Oa;
 /**
  * 群聊会话构体
  */
-class Calendar extends \QyWeixin\Model\Base
+class Calendar extends \Qyweixin\Model\Base
 {
 
     /**

@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 应用详情构体
  */
-class Agent extends \QyWeixin\Model\Base
+class Agent extends \Qyweixin\Model\Base
 {
 
     /**

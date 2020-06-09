@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 成员信息
  */
-class User extends \QyWeixin\Model\Base
+class User extends \Qyweixin\Model\Base
 {
 
     /**userid	是	成员UserID。对应管理端的帐号，企业内必须唯一。不区分大小写，长度为1~64个字节。只能由数字、字母和“_-@.”四种字符组成，且第一个字符必须是数字或字母。*/

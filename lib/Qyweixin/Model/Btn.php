@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 按钮构体
  */
-class Btn extends \QyWeixin\Model\Base
+class Btn extends \Qyweixin\Model\Base
 {
 
     /**

@@ -5,7 +5,7 @@ namespace Qyweixin\Model\Oa;
 /**
  * 提醒相关信息构体
  */
-class Reminder extends \QyWeixin\Model\Base
+class Reminder extends \Qyweixin\Model\Base
 {
 
     /**

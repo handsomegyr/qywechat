@@ -10,7 +10,7 @@ namespace Qyweixin\Model\ExternalContact;
  * image、link和miniprogram只能有一个，如果三者同时填，则按image、link、miniprogram的优先顺序取参，也就是说，如果image与link同时传值，则只有image生效。
  * media_id可以通过素材管理接口获得。
  */
-class Conclusion extends \QyWeixin\Model\Base
+class Conclusion extends \Qyweixin\Model\Base
 {
 
     /**

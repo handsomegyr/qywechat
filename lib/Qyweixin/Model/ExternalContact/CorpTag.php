@@ -5,7 +5,7 @@ namespace Qyweixin\Model\ExternalContact;
 /**
  * 企业客户标签
  */
-class CorpTag extends \QyWeixin\Model\Base
+class CorpTag extends \Qyweixin\Model\Base
 {
 
     /**

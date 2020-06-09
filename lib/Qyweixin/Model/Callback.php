@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 回调信息构体
  */
-class Callback extends \QyWeixin\Model\Base
+class Callback extends \Qyweixin\Model\Base
 {
 
     /**

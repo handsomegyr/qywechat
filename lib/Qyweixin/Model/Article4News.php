@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 图文构体
  */
-class Article4News extends \QyWeixin\Model\Base
+class Article4News extends \Qyweixin\Model\Base
 {
 
     /**

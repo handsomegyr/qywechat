@@ -5,7 +5,7 @@ namespace Qyweixin\Model\ExternalContact;
 /**
  * 「联系我」方式构体
  */
-class ContactWay extends \QyWeixin\Model\Base
+class ContactWay extends \Qyweixin\Model\Base
 {
 
     /**

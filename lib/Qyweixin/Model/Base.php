@@ -1,6 +1,6 @@
 <?php
 
-namespace QyWeixin\Model;
+namespace Qyweixin\Model;
 
 /**
  * 信息

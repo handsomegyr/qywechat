@@ -5,7 +5,7 @@ namespace Qyweixin\Model\ExternalContact\Conclusion;
 /**
  * 图片内容构体
  */
-class Image extends \QyWeixin\Model\Base
+class Image extends \Qyweixin\Model\Base
 {
 
     /**

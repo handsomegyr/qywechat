@@ -5,7 +5,7 @@ namespace Qyweixin\Model\ExternalContact\Conclusion;
 /**
  * 消息文本内容构体
  */
-class Text extends \QyWeixin\Model\Base
+class Text extends \Qyweixin\Model\Base
 {
 
     /**

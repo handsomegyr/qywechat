@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 群聊会话构体
  */
-class Appchat extends \QyWeixin\Model\Base
+class Appchat extends \Qyweixin\Model\Base
 {
 
     /**

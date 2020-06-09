@@ -5,7 +5,7 @@ namespace Qyweixin\Model\Service;
 /**
  * 推广二维码构体
  */
-class Register extends \QyWeixin\Model\Base
+class Register extends \Qyweixin\Model\Base
 {
 
     /**

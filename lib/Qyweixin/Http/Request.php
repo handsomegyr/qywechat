@@ -7,7 +7,7 @@
  *
  */
 
-namespace QyWeixin\Http;
+namespace Qyweixin\Http;
 
 class Request
 {

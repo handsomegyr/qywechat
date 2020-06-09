@@ -5,7 +5,7 @@ namespace Qyweixin\Model\ExternalAttr;
 /**
  * 对外属性构体
  */
-class Base extends \QyWeixin\Model\Base
+class Base extends \Qyweixin\Model\Base
 {
     /**
      * external_attr.name 属性名称： 需要先确保在管理端有创建该属性，否则会忽略 是

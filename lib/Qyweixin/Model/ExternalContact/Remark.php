@@ -5,7 +5,7 @@ namespace Qyweixin\Model\ExternalContact;
 /**
  * 客户备注信息
  */
-class Remark extends \QyWeixin\Model\Base
+class Remark extends \Qyweixin\Model\Base
 {
 
     /**

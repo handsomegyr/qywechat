@@ -5,7 +5,7 @@ namespace Qyweixin\Model;
 /**
  * 成员对外属性构体
  */
-class ExternalProfile extends \QyWeixin\Model\Base
+class ExternalProfile extends \Qyweixin\Model\Base
 {
 
     /**
