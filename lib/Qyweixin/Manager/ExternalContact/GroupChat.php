@@ -100,6 +100,7 @@ class GroupChat
         $rst = $this->_request->post($this->_url . 'list', $params);
         return $this->_client->rst($rst);
     }
+
     /**
      * 获取客户群详情
      * 调试工具
