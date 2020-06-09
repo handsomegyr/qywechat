@@ -1,0 +1,6 @@
+suites:
+    qywechat_suite:
+        namespace: Qyweixin
+        psr4_prefix: Qyweixin
+formatter.name: pretty
+
