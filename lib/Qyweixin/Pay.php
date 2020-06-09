@@ -1005,7 +1005,7 @@ class Pay
     /**
      * 获取请求对象
      *
-     * @return \QyWeixin\Http\Request
+     * @return \Qyweixin\Http\Request
      */
     protected function getRequest()
     {

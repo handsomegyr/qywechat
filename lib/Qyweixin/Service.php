@@ -44,7 +44,7 @@ class Service
     /**
      * 获取请求对象
      *
-     * @return \QyWeixin\Http\Request
+     * @return \Qyweixin\Http\Request
      */
     public function getRequest()
     {

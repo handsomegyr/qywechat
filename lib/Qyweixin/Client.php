@@ -120,13 +120,13 @@ class Client
      */
     private function initRequest()
     {
-        $this->_request = new \QyWeixin\Http\Request($this->getAccessToken());
+        $this->_request = new \Qyweixin\Http\Request($this->getAccessToken());
     }
 
     /**
      * 获取请求对象
      *
-     * @return \QyWeixin\Http\Request
+     * @return \Qyweixin\Http\Request
      */
     public function getRequest()
     {
