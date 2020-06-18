@@ -31,7 +31,7 @@ class Image extends \Qyweixin\Model\Base
         if ($this->isNotNull($this->media_id)) {
             $params['media_id'] = $this->media_id;
         }
-        if ($this->isNotNull($this->content)) {
+        if ($this->isNotNull($this->pic_url)) {
             $params['pic_url'] = $this->pic_url;
         }
         return $params;
