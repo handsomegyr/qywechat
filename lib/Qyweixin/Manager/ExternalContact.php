@@ -42,7 +42,7 @@ class ExternalContact
      *
      * @return \Qyweixin\Manager\ExternalContact\GroupWelcomeTemplate
      */
-    public function getReimburseManager()
+    public function getGroupWelcomeTemplateManager()
     {
         return new GroupWelcomeTemplate($this->_client);
     }
