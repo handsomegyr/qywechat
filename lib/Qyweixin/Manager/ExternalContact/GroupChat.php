@@ -326,7 +326,7 @@ class GroupChat
         $params['order_asc'] = $order_asc;
         $params['offset'] = $offset;
         $params['limit'] = $limit;
-        $rst = $this->_request->post($this->_url . 'transfer', $params);
+        $rst = $this->_request->post($this->_url . 'statistic', $params);
         return $this->_client->rst($rst);
     }
 }
