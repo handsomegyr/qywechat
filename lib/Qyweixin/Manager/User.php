@@ -920,4 +920,42 @@ class User
         $rst = $this->_request->post($this->_url . 'get_mobile_hashcode', $params);
         return $this->_client->rst($rst);
     }
+
+    /**
+     * 获取企业活跃成员数
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/user/get_active_stat?access_token=ACCESS_TOKEN
+     *
+     * {
+     * "date": "2020-03-27"
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证。获取方法查看“获取access_token”
+     * date 是 具体某天的活跃人数，最长支持获取30天前数据
+     * 权限说明：
+     *
+     * 仅通讯录同步助手可调用。
+     * 返回结果：
+     *
+     * {
+     * "errcode": 0,
+     * "errmsg": "ok",
+     * "active_cnt": 100
+     * }
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * active_cnt 活跃成员数
+     */
+    public function getActiveStat($date)
+    {
+        $params = array();
+        $params['date'] = $date;
+        $rst = $this->_request->post($this->_url . 'get_active_stat', $params);
+        return $this->_client->rst($rst);
+    }
 }
