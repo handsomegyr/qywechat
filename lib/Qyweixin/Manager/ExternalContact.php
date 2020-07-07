@@ -1473,4 +1473,275 @@ class ExternalContact
         $rst = $this->_request->post($this->_url . 'get_user_behavior_data', $params);
         return $this->_client->rst($rst);
     }
+
+    /**
+     * 外部联系人openid转换
+     * 企业和服务商可通过此接口，将微信外部联系人的userid（如何获取?）转为微信openid，用于调用支付相关接口。暂不支持企业微信外部联系人（ExternalUserid为wo开头）的userid转openid。
+     *
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/convert_to_openid?access_token=ACCESS_TOKEN
+     *
+     * 请求参数：
+     *
+     * {
+     * "external_userid":"wmAAAAAAA"
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * external_userid 是 外部联系人的userid，注意不是企业成员的帐号
+     * 返回结果：
+     *
+     * ｛
+     * "errcode":0,
+     * "errmsg":"ok",
+     * "openid":"ooAAAAAAAAAAA"
+     * ｝
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * openid 该企业的外部联系人openid
+     */
+    public function convertToOpenid($external_userid)
+    {
+        $params = array();
+        $params['external_userid'] = $external_userid;
+        $rst = $this->_request->post($this->_url . 'convert_to_openid', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 家长openid拉取userid
+     * 服务商可通过此接口，可以通过家长的openid拉取external userid，以及家长在其关注企业中对应的userid。
+     *
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/convert_to_external_userid?suite_access_token=SUITE_ACCESS_TOKEN
+     *
+     * 请求参数：
+     *
+     * {
+     * "openid":"oo2sbs-8dwPXXBbbPLXCkoAAAAA"
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * suite_access_token 是 第三方应用的suite_access_token，参见“获取第三方应用凭证”
+     * openid 是 外部联系人的openid，注意不是企业成员的帐号
+     * 返回结果：
+     *
+     * ｛
+     * "errcode":0,
+     * "errmsg":"ok",
+     * "external_userid":"wmAAAAAAA",
+     * "items":
+     * [
+     * {"corpid": "ww8dd8eb8dd40d92b2", "parent_userid":"lisi_parent_userid"},
+     * {"corpid": "ww9c71530db77f6cba", "parent_userid":"zhangsan_parent_userid"}
+     * ]
+     * ｝
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * external_userid 家长的external userid
+     * items 家长关注企业及其对应的userid关系列表
+     * corpid 家长关注的企业corpid
+     * parent_userid 家长在关注企业中对应的userid
+     */
+    public function convertToExternalUserid($openid)
+    {
+        $params = array();
+        $params['openid'] = $openid;
+        $rst = $this->_request->post($this->_url . 'convert_to_external_userid', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 手机号转外部联系人ID
+     * 请求方式：POST（HTTPS）
+     *
+     * 请求地址:https://qyapi.weixin.qq.com/cgi-bin/externalcontact/batch_to_external_userid?access_token=ACCESS_TOKEN
+     *
+     * 请求示例
+     *
+     * {
+     * "mobiles": [
+     * "10000000000",
+     * "10000000001"
+     * ]
+     * }
+     * 参数说明:
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * mobiles 是 家长手机号列表，最多支持100个
+     * 权限说明：
+     * 学校需要使用“家校沟通”secret所获取的accesstoken来调用（accesstoken如何获取？）；
+     * 第三方应用需拥有「家校沟通」使用权限。
+     *
+     * 返回结果:
+     *
+     * {
+     * "errcode": 0,
+     * "errmsg": "ok",
+     * "success_list": [
+     * {
+     * "mobile": "18900000000",
+     * "external_userid": "aaabbbcccc",
+     * "foreign_key": "zhangsan"
+     * }
+     * ],
+     * "fail_list": [
+     * {
+     * "errcode": 60136,
+     * "errmsg": "record not found",
+     * "mobile": "10000000001"
+     * }
+     * ]
+     * }
+     * 参数说明:
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * success_list 转换成功列表
+     * success_list.mobile 手机号
+     * success_list.external_userid 外部联系人的userid(家长关注后才会返回该字段)
+     * success_list.foreign_key 由企业或服务商在导入家长时指定的关键字，也就是家校通讯录中的家长ID
+     * fail_list 转换失败列表
+     * fail_list.errcode 返回码
+     * fail_list.errmsg 对返回码的文本描述内容
+     * fail_list.mobile 手机号
+     */
+    public function batchToExternalUserid(array $mobiles)
+    {
+        $params = array();
+        $params['mobiles'] = $mobiles;
+        $rst = $this->_request->post($this->_url . 'batch_to_external_userid', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 获取「学校通知」二维码
+     * 学校可通过此接口获取「学校通知」二维码，家长可通过扫描此二维码关注「学校通知」并接收学校推送的消息。
+     * 请求方式：GET（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_subscribe_qr_code?access_token=ACCESS_TOKEN
+     *
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * 权限说明：
+     *
+     * 学校需要使用“家校沟通”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）；
+     * 第三方应用需拥有「家校沟通」使用权限。
+     * 企业必须完成验证才可调用此接口，否则返回43009(企业需要验证)错误码。
+     * 返回结果：
+     *
+     * {
+     * "errcode": 0,
+     * "errmsg": "ok",
+     * "qrcode_big":"http://p.qpic.cn/wwhead/XXXX",
+     * "qrcode_middle":"http://p.qpic.cn/wwhead/XXXX",
+     * "qrcode_thumb":"http://p.qpic.cn/wwhead/XXXX"
+     * }
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * qrcode_big 1200px的大尺寸二维码
+     * qrcode_middle 430px的中尺寸二维码
+     * qrcode_thumb 258px的小尺寸二维码
+     */
+    public function getSubscribeQrcode()
+    {
+        $params = array();
+        $rst = $this->_request->get($this->_url . 'get_subscribe_qr_code', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 管理「学校通知」的关注模式
+     * 设置关注「学校通知」的模式
+     * 获取关注「学校通知」的模式
+     * 设置关注「学校通知」的模式
+     * 可通过此接口修改家长关注「学校通知」的模式：“可扫码填写资料加入”或“禁止扫码填写资料加入”
+     *
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/set_subscribe_mode?access_token=ACCESS_TOKEN
+     *
+     * 请求参数：
+     *
+     * {
+     * "subscribe_mode":1,
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * subscribe_mode 是 关注模式, 1:可扫码填写资料加入, 2:禁止扫码填写资料加入
+     * 权限说明：
+     *
+     * 企业需要使用“家校沟通”secret所获取的accesstoken来调用（accesstoken如何获取？）；
+     * 第三方应用需拥有「家校沟通」使用和编辑权限。
+     * 返回结果：
+     *
+     * {
+     * "errcode": 0,
+     * "errmsg": "ok",
+     * }
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     */
+    public function setSubscribeMode($subscribe_mode)
+    {
+        $params = array();
+        $params['subscribe_mode'] = $subscribe_mode;
+        $rst = $this->_request->post($this->_url . 'set_subscribe_mode', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 获取关注「学校通知」的模式
+     * 可通过此接口获取家长关注「学校通知」的模式：“可扫码填写资料加入”或“禁止扫码填写资料加入”
+     *
+     * 请求方式：GET（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_subscribe_mode?access_token=ACCESS_TOKEN
+     *
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * 权限说明：
+     *
+     * 企业需要使用“家校沟通”secret所获取的accesstoken来调用（accesstoken如何获取？）；
+     * 第三方应用需拥有「家校沟通」使用权限。
+     * 返回结果：
+     *
+     * {
+     * "errcode": 0,
+     * "errmsg": "ok",
+     * "subscribe_mode":1
+     * }
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * subscribe_mode 关注模式, 1:可扫码填写资料加入, 2:禁止扫码填写资料加入
+     */
+    public function getSubscribeMode()
+    {
+        $params = array();
+        $rst = $this->_request->get($this->_url . 'get_subscribe_mode', $params);
+        return $this->_client->rst($rst);
+    }
 }
