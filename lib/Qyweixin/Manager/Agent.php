@@ -186,4 +186,159 @@ class Agent
         $rst = $this->_request->post($this->_url . 'set', $params);
         return $this->_client->rst($rst);
     }
+
+    /**
+     * 设置应用在工作台展示的模版
+     * 请求说明：该接口指定应用自定义模版类型。同时也支持设置企业默认模版数据。若type指定为 “normal” 则为取消自定义模式，改为普通展示模式
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/agent/set_workbench_template?access_token=ACCESS_TOKEN
+     *
+     * 请求示例
+     *
+     * {
+     * "agentid":1000005,
+     * "type":"image",
+     * "image":{
+     * "url":"xxxx",
+     * "jump_url":"http://www.qq.com",
+     * "pagepath":"pages/index"
+     * },
+     * "replace_user_data":true
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * type 是 模版类型，目前支持的自定义类型包括 “keydata”、 “image”、 “list”、 “webview” 。若设置的type为 “normal”,则相当于从自定义模式切换为普通宫格或者列表展示模式
+     * agentid 是 应用id
+     * keydata 否 若type指定为 “keydata”，且需要设置企业级别默认数据，则需要设置关键数据型模版数据,数据结构参考“关键数据型”
+     * image 否 若type指定为 “image”，且需要设置企业级别默认数据，则需要设置图片型模版数据,数据结构参考“图片型”
+     * list 否 若type指定为 “list”，且需要设置企业级别默认数据，则需要设置列表型模版数据,数据结构参考“列表型”
+     * webview 否 若type指定为 “webview”，且需要设置企业级别默认数据，则需要设置webview型模版数据,数据结构参考“webview型”
+     * replace_user_data 否 是否覆盖用户工作台的数据。设置为true的时候，会覆盖企业所有用户当前设置的数据。若设置为false,则不会覆盖用户当前设置的所有数据。默认为false
+     * 权限说明：
+     * 可设置当前凭证对应的应用；
+     *
+     * 返回结果 ：
+     *
+     * {
+     * "errcode":0,
+     * "errmsg":"ok"
+     * }
+     */
+    public function setWorkbenchTemplate($agentid, \Qyweixin\Model\WorkbenchTemplate\Base $workbenchTemplate, $replace_user_data = false)
+    {
+        $params = array();
+        $params['agentid'] = $agentid;
+        $params = array_merge($params, $workbenchTemplate->getParams());
+        $params['replace_user_data'] = $replace_user_data;
+
+        $rst = $this->_request->post($this->_url . 'set_workbench_template', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 获取应用在工作台展示的模版
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/agent/get_workbench_template?access_token=ACCESS_TOKEN
+     *
+     * 请求示例：
+     *
+     * {
+     * "agentid":1000005
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * agentid 是 应用id
+     * 权限说明：
+     * 可设置当前凭证对应的应用；
+     *
+     * 返回结果 ：
+     *
+     * {
+     * "errcode":0,
+     * "errmsg":"ok"
+     * "type":"image",
+     * "image":{
+     * "url":"xxxx",
+     * "jump_url":"http://www.qq.com",
+     * "pagepath":"pages/index"
+     * },
+     * "replace_user_data":true
+     * }
+     */
+    public function getWorkbenchTemplate($agentid)
+    {
+        $params = array();
+        $params['agentid'] = $agentid;
+        $rst = $this->_request->post($this->_url . 'get_workbench_template', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 设置应用在用户工作台展示的数据
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/agent/set_workbench_data?access_token=ACCESS_TOKEN
+     *
+     * 请求示例
+     *
+     * {
+     * "agentid":1000005,
+     * "userid":"test",
+     * "type":"keydata",
+     * "keydata":{
+     * "items":[
+     * {
+     * "key":"待审批",
+     * "data":"2",
+     * "jump_url":"http://www.qq.com",
+     * "pagepath":"pages/index"
+     * },
+     * {
+     * "key":"带批阅作业",
+     * "data":"4",
+     * "jump_url":"http://www.qq.com",
+     * "pagepath":"pages/index"
+     * },
+     * {
+     * "key":"成绩录入",
+     * "data":"45",
+     * "jump_url":"http://www.qq.com",
+     * "pagepath":"pages/index"
+     * },
+     * {
+     * "key":"综合评价",
+     * "data":"98",
+     * "jump_url":"http://www.qq.com",
+     * "pagepath":"pages/index"
+     * }
+     * ]
+     * }
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * agentid 是 应用id
+     * userid 是 需要设置的用户的userid
+     * type 是 目前支持 “keydata”、 “image”、 “list” 、”webview”
+     * keydata 否 若type指定为 “keydata”，则需要设置关键数据型模版数据,数据结构参考“关键数据型”
+     * image 否 若type指定为 “image”，则需要设置图片型模版数据，数据结构参考“图片型”
+     * list 否 若type指定为 “list”，则需要设置列表型模版数据，数据结构参考“列表型”
+     * webview 否 若type指定为 “webview”，则需要设置webview型模版数据，数据结构参考“webview数据型”
+     * 权限说明：
+     * 可设置当前凭证对应的应用；设置的userid必须在应用可见范围
+     * 每个用户每个应用接口限制10次/分钟
+     */
+    public function setWorkbenchData($agentid, $userid, \Qyweixin\Model\WorkbenchTemplate\Base $workbenchTemplate)
+    {
+        $params = array();
+        $params['agentid'] = $agentid;
+        $params['userid'] = $userid;
+        $params = array_merge($params, $workbenchTemplate->getParams());
+        $rst = $this->_request->post($this->_url . 'set_workbench_data', $params);
+        return $this->_client->rst($rst);
+    }
 }
