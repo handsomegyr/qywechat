@@ -26,6 +26,7 @@ use Qyweixin\Manager\Oa;
 use Qyweixin\Manager\Reply;
 use Qyweixin\Manager\Tag;
 use Qyweixin\Manager\User;
+use Qyweixin\Manager\MsgAudit;
 
 class Client
 {
@@ -308,6 +309,16 @@ class Client
     public function getUserManager()
     {
         return new User($this);
+    }
+
+    /**
+     * 获取会话内容存档管理器
+     *
+     * @return \Qyweixin\Manager\MsgAudit
+     */
+    public function getMsgAuditManager()
+    {
+        return new MsgAudit($this);
     }
 
     /**
