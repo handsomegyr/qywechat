@@ -27,6 +27,8 @@ use Qyweixin\Manager\Reply;
 use Qyweixin\Manager\Tag;
 use Qyweixin\Manager\User;
 use Qyweixin\Manager\MsgAudit;
+use Qyweixin\Manager\Living;
+use Qyweixin\Manager\Health;
 
 class Client
 {
@@ -319,6 +321,26 @@ class Client
     public function getMsgAuditManager()
     {
         return new MsgAudit($this);
+    }
+
+    /**
+     * 获取企业直播管理器
+     *
+     * @return \Qyweixin\Manager\Living
+     */
+    public function getLivingManager()
+    {
+        return new Living($this);
+    }
+
+    /**
+     * 获取健康上报管理器
+     *
+     * @return \Qyweixin\Manager\Health
+     */
+    public function getHealthManager()
+    {
+        return new Health($this);
     }
 
     /**

@@ -196,4 +196,48 @@ class MsgAudit
         $rst = $this->_request->post($this->_url . 'check_room_agree', $params);
         return $this->_client->rst($rst);
     }
+
+    /**
+     * 获取机器人信息
+     * 通过robot_id获取机器人的名称和创建者
+     *
+     * 请求方式：GET（HTTPS）
+     *
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/msgaudit/get_robot_info?access_token=ACCESS_TOKEN&robot_id=ROBOT_ID
+     *
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * robot_id 是 机器人ID。
+     * 权限说明：
+     *
+     * 只能通过会话存档的access_token获取。
+     *
+     * 返回结果：
+     *
+     * {
+     * "errcode": 0,
+     * "errmsg": "ok",
+     * "data": {
+     * "robot_id": "wbxxxxxxxxxxxxxxxxxxxxxxxx",
+     * "name": "机器人A",
+     * "creator_userid": "zhangsan"
+     * }
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * robot_id 机器人ID
+     * name 机器人名称
+     * creator_userid 机器人创建者的UserID
+     */
+    public function getRobotInfo($robot_id)
+    {
+        $params = array();
+        $params['robot_id'] = $robot_id;
+        $rst = $this->_request->get($this->_url . 'get_robot_info', $params);
+        return $this->_client->rst($rst);
+    }
 }
