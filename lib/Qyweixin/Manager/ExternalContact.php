@@ -4,7 +4,9 @@ namespace Qyweixin\Manager;
 
 use Qyweixin\Client;
 use Qyweixin\Manager\ExternalContact\GroupChat;
+use Qyweixin\Manager\ExternalContact\GroupMsg;
 use Qyweixin\Manager\ExternalContact\GroupWelcomeTemplate;
+use Qyweixin\Manager\ExternalContact\Moment;
 
 /**
  * 外部企业的联系人管理
@@ -45,6 +47,26 @@ class ExternalContact
     public function getGroupWelcomeTemplateManager()
     {
         return new GroupWelcomeTemplate($this->_client);
+    }
+
+    /**
+     * 获取客户朋友圈对象
+     *
+     * @return \Qyweixin\Manager\ExternalContact\Moment
+     */
+    public function getMomentManager()
+    {
+        return new Moment($this->_client);
+    }
+
+    /**
+     * 获取企业的全部群发对象
+     *
+     * @return \Qyweixin\Manager\ExternalContact\GroupMsg
+     */
+    public function getGroupMsgManager()
+    {
+        return new GroupMsg($this->_client);
     }
 
     /**
