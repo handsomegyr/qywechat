@@ -116,7 +116,7 @@ class Moment
      * moment_list.location.longitude 地理位置经度
      * moment_list.location.name 地理位置名称
      */
-    public function getMomentList($start_time, $end_time, $creator = "", $filter_type = 2, $limit = 1000, $cursor = "")
+    public function getMomentList($start_time, $end_time, $creator = "", $filter_type = 2, $limit = 100, $cursor = "")
     {
         $params = array();
         $params['start_time'] = $start_time;
