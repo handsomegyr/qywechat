@@ -1,23 +1,21 @@
 <?php
 
-namespace Qyweixin\Manager;
+namespace Qyweixin\Manager\Linkedcorp;
 
 use Qyweixin\Client;
 
 /**
- * 互联企业消息推送
+ * 互联企业消息
  *
  * @author guoyongrong <handsomegyr@126.com>
  */
-class LinkedcorpMessage
+class Message
 {
+
     // 接口地址
-    private $_url = 'https://qyapi.weixin.qq.com/cgi-bin/linkedcorp/message/send/';
-
+    private $_url = 'https://qyapi.weixin.qq.com/cgi-bin/linkedcorp/message/';
     private $_client;
-
     private $_request;
-
     public function __construct(Client $client)
     {
         $this->_client = $client;
@@ -47,7 +45,7 @@ class LinkedcorpMessage
      * }
      * 如果部分接收人无权限或不存在，发送仍然执行，但会返回无效的部分（即invaliduser或invalidparty），常见的原因是接收人不在应用的可见范围内。
      */
-    public function send(\Qyweixin\Model\LinkedcorpMsg\Base $message)
+    public function send(\Qyweixin\Model\Linkedcorp\Message\Base $message)
     {
         $params = $message->getParams();
         $rst = $this->_request->post($this->_url . 'send', $params);

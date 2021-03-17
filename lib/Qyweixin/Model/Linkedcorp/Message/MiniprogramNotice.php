@@ -1,11 +1,11 @@
 <?php
 
-namespace Qyweixin\Model\LinkedcorpMsg;
+namespace Qyweixin\Model\Linkedcorp\Message;
 
 /**
  * 小程序通知消息构体
  */
-class MiniprogramNotice extends \Qyweixin\Model\LinkedcorpMsg\Base
+class MiniprogramNotice extends \Qyweixin\Model\Linkedcorp\Message\Base
 {
 
     /**

@@ -1,20 +1,20 @@
 <?php
 
-namespace Qyweixin\Model\LinkedcorpMsg;
+namespace Qyweixin\Model\Linkedcorp\Message;
 
 /**
- * 图片消息构体
+ * 文件消息构体
  */
-class Image extends \Qyweixin\Model\LinkedcorpMsg\Base
+class File extends \Qyweixin\Model\Linkedcorp\Message\Base
 {
 
     /**
-     * msgtype 是 消息类型，此时固定为：image
+     * msgtype 是 消息类型，此时固定为：file
      */
-    protected $msgtype = 'image';
+    protected $msgtype = 'file';
 
     /**
-     * media_id 是 图片媒体文件id，可以调用上传临时素材接口获取
+     * media_id 是 文件id，可以调用上传临时素材接口获取
      */
     public $media_id = NULL;
 

@@ -18,7 +18,6 @@ use Qyweixin\Manager\Department;
 use Qyweixin\Manager\Dial;
 use Qyweixin\Manager\ExternalContact;
 use Qyweixin\Manager\Ip;
-use Qyweixin\Manager\LinkedcorpMessage;
 use Qyweixin\Manager\Media;
 use Qyweixin\Manager\Menu;
 use Qyweixin\Manager\Message;
@@ -29,6 +28,7 @@ use Qyweixin\Manager\User;
 use Qyweixin\Manager\MsgAudit;
 use Qyweixin\Manager\Living;
 use Qyweixin\Manager\Health;
+use Qyweixin\Manager\Linkedcorp;
 
 class Client
 {
@@ -234,13 +234,13 @@ class Client
     }
 
     /**
-     * 获取互联企业消息推送管理器
+     * 获取互联企业管理器
      *
-     * @return \Qyweixin\Manager\LinkedcorpMessage
+     * @return \Qyweixin\Manager\Linkedcorp
      */
-    public function getLinkedcorpMessageManager()
+    public function getLinkedcorpManager()
     {
-        return new LinkedcorpMessage($this);
+        return new Linkedcorp($this);
     }
 
     /**

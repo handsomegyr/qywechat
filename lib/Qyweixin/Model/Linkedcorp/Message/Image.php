@@ -1,20 +1,20 @@
 <?php
 
-namespace Qyweixin\Model\LinkedcorpMsg;
+namespace Qyweixin\Model\Linkedcorp\Message;
 
 /**
- * 语音消息构体
+ * 图片消息构体
  */
-class Voice extends \Qyweixin\Model\LinkedcorpMsg\Base
+class Image extends \Qyweixin\Model\Linkedcorp\Message\Base
 {
 
     /**
-     * msgtype 是 消息类型，此时固定为：voice
+     * msgtype 是 消息类型，此时固定为：image
      */
-    protected $msgtype = 'voice';
+    protected $msgtype = 'image';
 
     /**
-     * media_id 是 语音文件id，可以调用上传临时素材接口获取
+     * media_id 是 图片媒体文件id，可以调用上传临时素材接口获取
      */
     public $media_id = NULL;
 

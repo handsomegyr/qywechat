@@ -1,21 +1,20 @@
 <?php
 
-namespace Qyweixin\Model\LinkedcorpMsg;
+namespace Qyweixin\Model\Linkedcorp\Message;
 
 /**
- * markdown消息构体
- * https://work.weixin.qq.com/api/doc/90000/90135/90236
+ * 文本消息构体
  */
-class Markdown extends \Qyweixin\Model\LinkedcorpMsg\Base
+class Text extends \Qyweixin\Model\Linkedcorp\Message\Base
 {
 
     /**
-     * msgtype 是 消息类型，此时固定为：markdown
+     * msgtype 是 消息类型，此时固定为：text
      */
-    protected $msgtype = 'markdown';
+    protected $msgtype = 'text';
 
     /**
-     * content 是 markdown内容，最长不超过2048个字节，必须是utf8编码
+     * content 是 消息内容，最长不超过2048个字节，超过将截断（支持id转译）
      */
     public $content = NULL;
 

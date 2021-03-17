@@ -1,11 +1,11 @@
 <?php
 
-namespace Qyweixin\Model\LinkedcorpMsg;
+namespace Qyweixin\Model\Linkedcorp\Message;
 
 /**
  * 文本卡片消息构体
  */
-class TextCard extends \Qyweixin\Model\LinkedcorpMsg\Base
+class TextCard extends \Qyweixin\Model\Linkedcorp\Message\Base
 {
 
     /**

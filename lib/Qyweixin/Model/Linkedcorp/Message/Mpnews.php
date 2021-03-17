@@ -1,11 +1,11 @@
 <?php
 
-namespace Qyweixin\Model\LinkedcorpMsg;
+namespace Qyweixin\Model\Linkedcorp\Message;
 
 /**
  * 图文消息构体
  */
-class Mpnews extends \Qyweixin\Model\LinkedcorpMsg\Base
+class Mpnews extends \Qyweixin\Model\Linkedcorp\Message\Base
 {
 
     /**

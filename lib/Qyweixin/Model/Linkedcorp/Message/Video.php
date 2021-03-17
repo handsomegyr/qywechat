@@ -1,11 +1,11 @@
 <?php
 
-namespace Qyweixin\Model\LinkedcorpMsg;
+namespace Qyweixin\Model\Linkedcorp\Message;
 
 /**
  * 视频消息构体
  */
-class Video extends \Qyweixin\Model\LinkedcorpMsg\Base
+class Video extends \Qyweixin\Model\Linkedcorp\Message\Base
 {
 
     /**
