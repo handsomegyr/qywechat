@@ -28,6 +28,8 @@ class Miniprogram extends \Qyweixin\Model\Base
      */
     public $page = NULL;
 
+    protected $msgtype = "miniprogram";
+
     public function __construct($title, $pic_media_id, $appid, $page)
     {
         $this->title = $title;
@@ -39,18 +41,21 @@ class Miniprogram extends \Qyweixin\Model\Base
     public function getParams()
     {
         $params = array();
+        if ($this->isNotNull($this->msgtype)) {
+            $params['msgtype'] = $this->msgtype;
+        }
 
         if ($this->isNotNull($this->title)) {
-            $params['title'] = $this->title;
+            $params[$this->msgtype]['title'] = $this->title;
         }
         if ($this->isNotNull($this->pic_media_id)) {
-            $params['pic_media_id'] = $this->pic_media_id;
+            $params[$this->msgtype]['pic_media_id'] = $this->pic_media_id;
         }
         if ($this->isNotNull($this->appid)) {
-            $params['appid'] = $this->appid;
+            $params[$this->msgtype]['appid'] = $this->appid;
         }
         if ($this->isNotNull($this->page)) {
-            $params['page'] = $this->page;
+            $params[$this->msgtype]['page'] = $this->page;
         }
 
         return $params;

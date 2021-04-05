@@ -14,11 +14,8 @@ class GroupWelcomeTemplate
 
     // 接口地址
     private $_url = 'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/group_welcome_template/';
-
     private $_client;
-
     private $_request;
-
     public function __construct(Client $client)
     {
         $this->_client = $client;
@@ -40,7 +37,8 @@ class GroupWelcomeTemplate
      * "content":"亲爱的%NICKNAME%用户，你好"
      * },
      * "image": {
-     * "media_id": "MEDIA_ID"
+     * "media_id": "MEDIA_ID",
+     * "pic_url":"http://p.qpic.cn/pic_wework/3474110808/7a6344sdadfwehe42060/0"
      * },
      * "link": {
      * "title": "消息标题",
@@ -53,7 +51,9 @@ class GroupWelcomeTemplate
      * "pic_media_id": "MEDIA_ID",
      * "appid": "wx8bd80126147dfAAA",
      * "page": "/path/index"
-     * }
+     * },
+     * "agentid" : 1000014,
+     * "notify" : 1
      * }
      * 参数说明:
      *
@@ -61,6 +61,7 @@ class GroupWelcomeTemplate
      * access_token 是 调用接口凭证
      * text.content 否 消息文本内容,最长为3000字节
      * image.media_id 是 图片的media_id
+     * image.pic_url 否 图片的链接，仅可使用上传图片接口得到的链接
      * link.title 是 图文消息标题，最长为128字节
      * link.picurl 否 图文消息封面的url
      * link.desc 否 图文消息的描述，最长为512字节
@@ -69,6 +70,9 @@ class GroupWelcomeTemplate
      * miniprogram.pic_media_id 是 小程序消息封面的mediaid，封面图建议尺寸为520*416
      * miniprogram.appid 是 小程序appid，必须是关联到企业的小程序应用
      * miniprogram.page 是 小程序page路径
+     * agentid 否 授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
+     * notify 否 是否通知成员将这条入群欢迎语应用到客户群中，0-不通知，1-通知， 不填则通知
+     *
      * text中支持配置多个%NICKNAME%(大小写敏感)形式的欢迎语，当配置了欢迎语占位符后，发送给客户时会自动替换为客户的昵称;
      * text、image、link和miniprogram四者不能同时为空；
      * text与另外三者可以同时发送，此时将会以两条消息的形式触达客户

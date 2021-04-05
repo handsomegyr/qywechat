@@ -4,11 +4,6 @@ namespace Qyweixin\Model\ExternalContact;
 
 /**
  * 结束语构体
- * text中支持配置多个%NICKNAME%(大小写敏感)形式的欢迎语，当配置了欢迎语占位符后，发送给客户时会自动替换为客户的昵称;
- * text、image、link和miniprogram四者不能同时为空；
- * text与另外三者可以同时发送，此时将会以两条消息的形式触达客户
- * image、link和miniprogram只能有一个，如果三者同时填，则按image、link、miniprogram的优先顺序取参，也就是说，如果image与link同时传值，则只有image生效。
- * media_id可以通过素材管理接口获得。
  */
 class GroupWelcomeTemplate extends \Qyweixin\Model\Base
 {
@@ -41,6 +36,20 @@ class GroupWelcomeTemplate extends \Qyweixin\Model\Base
      */
     public $miniprogram = NULL;
 
+    /**
+     * agentid	否	授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
+     *
+     * @var string
+     */
+    public $agentid = NULL;
+
+    /**
+     * notify	否	是否通知成员将这条入群欢迎语应用到客户群中，0-不通知，1-通知， 不填则通知
+     *
+     * @var number
+     */
+    public $notify = NULL;
+
     public function __construct()
     {
     }
@@ -53,13 +62,22 @@ class GroupWelcomeTemplate extends \Qyweixin\Model\Base
             $params['text'] = $this->text->getParams();
         }
         if ($this->isNotNull($this->image)) {
-            $params['image'] = $this->image->getParams();
+            $imgParams = $this->image->getParams();
+            $params['image'] = $imgParams[$imgParams['msgtype']];
         }
         if ($this->isNotNull($this->link)) {
-            $params['link'] = $this->link->getParams();
+            $linkParams = $this->link->getParams();
+            $params['link'] = $linkParams[$linkParams['msgtype']];
         }
         if ($this->isNotNull($this->miniprogram)) {
-            $params['miniprogram'] = $this->miniprogram->getParams();
+            $miniprogramParams = $this->miniprogram->getParams();
+            $params['miniprogram'] = $miniprogramParams[$miniprogramParams['msgtype']];
+        }
+        if ($this->isNotNull($this->agentid)) {
+            $params['agentid'] = $this->agentid;
+        }
+        if ($this->isNotNull($this->notify)) {
+            $params['notify'] = $this->notify;
         }
         return $params;
     }

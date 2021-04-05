@@ -18,6 +18,8 @@ class Image extends \Qyweixin\Model\Base
      */
     public $pic_url = NULL;
 
+    protected $msgtype = "image";
+
     public function __construct($media_id, $pic_url)
     {
         $this->media_id = $media_id;
@@ -28,11 +30,15 @@ class Image extends \Qyweixin\Model\Base
     {
         $params = array();
 
+        if ($this->isNotNull($this->msgtype)) {
+            $params['msgtype'] = $this->msgtype;
+        }
+
         if ($this->isNotNull($this->media_id)) {
-            $params['media_id'] = $this->media_id;
+            $params[$this->msgtype]['media_id'] = $this->media_id;
         }
         if ($this->isNotNull($this->pic_url)) {
-            $params['pic_url'] = $this->pic_url;
+            $params[$this->msgtype]['pic_url'] = $this->pic_url;
         }
         return $params;
     }

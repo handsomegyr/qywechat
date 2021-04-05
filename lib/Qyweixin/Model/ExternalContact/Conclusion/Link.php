@@ -28,6 +28,8 @@ class Link extends \Qyweixin\Model\Base
      */
     public $url = NULL;
 
+    protected $msgtype = "link";
+
     public function __construct($title, $picurl, $desc, $url)
     {
         $this->title = $title;
@@ -40,17 +42,21 @@ class Link extends \Qyweixin\Model\Base
     {
         $params = array();
 
+        if ($this->isNotNull($this->msgtype)) {
+            $params['msgtype'] = $this->msgtype;
+        }
+
         if ($this->isNotNull($this->title)) {
-            $params['title'] = $this->title;
+            $params[$this->msgtype]['title'] = $this->title;
         }
         if ($this->isNotNull($this->picurl)) {
-            $params['picurl'] = $this->picurl;
+            $params[$this->msgtype]['picurl'] = $this->picurl;
         }
         if ($this->isNotNull($this->desc)) {
-            $params['desc'] = $this->desc;
+            $params[$this->msgtype]['desc'] = $this->desc;
         }
         if ($this->isNotNull($this->url)) {
-            $params['url'] = $this->url;
+            $params[$this->msgtype]['url'] = $this->url;
         }
         return $params;
     }

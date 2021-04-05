@@ -4,14 +4,9 @@ namespace Qyweixin\Model\ExternalContact;
 
 /**
  * 企业群发消息任务
- * text、image、link和miniprogram四者不能同时为空；
- * text与另外三者可以同时发送，此时将会以两条消息的形式触达客户
- * image、link和miniprogram只能有一个，如果三者同时填，则按image、link、miniprogram的优先顺序取参，也就是说，如果image与link同时传值，则只有image生效。
- * media_id可以通过素材管理接口获得。
  */
 class MsgTemplate extends \Qyweixin\Model\Base
 {
-
     /**
      * chat_type 否 群发任务的类型，默认为single，表示发送给客户，group表示发送给客户群
      */
@@ -34,26 +29,33 @@ class MsgTemplate extends \Qyweixin\Model\Base
      */
     public $text = NULL;
 
-    /**
-     * image 图片
-     *
-     * @var \Qyweixin\Model\ExternalContact\Conclusion\Image
-     */
-    public $image = NULL;
+    // /**
+    //  * image 图片
+    //  *
+    //  * @var \Qyweixin\Model\ExternalContact\Conclusion\Image
+    //  */
+    // public $image = NULL;
+
+    // /**
+    //  * link 图文消息
+    //  *
+    //  * @var \Qyweixin\Model\ExternalContact\Conclusion\Link
+    //  */
+    // public $link = NULL;
+
+    // /**
+    //  * miniprogram 小程序消息
+    //  *
+    //  * @var \Qyweixin\Model\ExternalContact\Conclusion\Miniprogram
+    //  */
+    // public $miniprogram = NULL;
 
     /**
-     * link 图文消息
+     * attachments	否	附件，最多支持添加9个附件
      *
-     * @var \Qyweixin\Model\ExternalContact\Conclusion\Link
+     * @var array
      */
-    public $link = NULL;
-
-    /**
-     * miniprogram 小程序消息
-     *
-     * @var \Qyweixin\Model\ExternalContact\Conclusion\Miniprogram
-     */
-    public $miniprogram = NULL;
+    public $attachments = NULL;
 
     public function __construct()
     {
@@ -72,19 +74,23 @@ class MsgTemplate extends \Qyweixin\Model\Base
         if ($this->isNotNull($this->sender)) {
             $params['sender'] = $this->sender;
         }
-
         if ($this->isNotNull($this->text)) {
             $params['text'] = $this->text->getParams();
         }
-        if ($this->isNotNull($this->image)) {
-            $params['image'] = $this->image->getParams();
+        if ($this->isNotNull($this->attachments)) {
+            foreach ($this->attachments as $attachment) {
+                $params['attachments'][] = $attachment->getParams();
+            }
         }
-        if ($this->isNotNull($this->link)) {
-            $params['link'] = $this->link->getParams();
-        }
-        if ($this->isNotNull($this->miniprogram)) {
-            $params['miniprogram'] = $this->miniprogram->getParams();
-        }
+        // if ($this->isNotNull($this->image)) {
+        //     $params['image'] = $this->image->getParams();
+        // }
+        // if ($this->isNotNull($this->link)) {
+        //     $params['link'] = $this->link->getParams();
+        // }
+        // if ($this->isNotNull($this->miniprogram)) {
+        //     $params['miniprogram'] = $this->miniprogram->getParams();
+        // }
         return $params;
     }
 }

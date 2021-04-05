@@ -53,14 +53,18 @@ class Conclusion extends \Qyweixin\Model\Base
             $params['text'] = $this->text->getParams();
         }
         if ($this->isNotNull($this->image)) {
-            $params['image'] = $this->image->getParams();
+            $imgParams = $this->image->getParams();
+            $params['image'] = $imgParams[$imgParams['msgtype']];
         }
         if ($this->isNotNull($this->link)) {
-            $params['link'] = $this->link->getParams();
+            $linkParams = $this->link->getParams();
+            $params['link'] = $linkParams[$linkParams['msgtype']];
         }
         if ($this->isNotNull($this->miniprogram)) {
-            $params['miniprogram'] = $this->miniprogram->getParams();
+            $miniprogramParams = $this->miniprogram->getParams();
+            $params['miniprogram'] = $miniprogramParams[$miniprogramParams['msgtype']];
         }
+
         return $params;
     }
 }

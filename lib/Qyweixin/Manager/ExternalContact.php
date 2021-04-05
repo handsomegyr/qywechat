@@ -1085,31 +1085,44 @@ class ExternalContact
      * 请求示例
      *
      * {
-     * "chat_type":"single",
-     * "external_userid": [
-     * "woAJ2GCAAAXtWyujaWJHDDGi0mACAAAA",
-     * "wmqfasd1e1927831123109rBAAAA"
-     * ],
-     * "sender":"zhangsan",
-     * "text": {
-     * "content":"文本消息内容"
-     * },
-     * "image": {
-     * "media_id": "MEDIA_ID"
-     * },
-     * "link": {
-     * "title": "消息标题",
-     * "picurl": "https://example.pic.com/path",
-     * "desc": "消息描述",
-     * "url": "https://example.link.com/path"
-     * },
-     * "miniprogram": {
-     * "title": "消息标题",
-     * "pic_media_id": "MEDIA_ID",
-     * "appid": "wx8bd80126147dfAAA",
-     * "page": "/path/index"
-     * }
-     * }
+    "chat_type": "single",
+    "external_userid": [
+        "woAJ2GCAAAXtWyujaWJHDDGi0mACAAAA",
+        "wmqfasd1e1927831123109rBAAAA"
+    ],
+    "sender": "zhangsan",
+    "text": {
+        "content": "文本消息内容"
+    },
+    "attachments": [{
+        "msgtype": "image",
+        "image": {
+            "media_id": "MEDIA_ID",
+            "pic_url": "http://p.qpic.cn/pic_wework/3474110808/7a6344sdadfwehe42060/0"
+        }
+    }, {
+        "msgtype": "link",
+        "link": {
+            "title": "消息标题",
+            "picurl": "https://example.pic.com/path",
+            "desc": "消息描述",
+            "url": "https://example.link.com/path"
+        }
+    }, {
+        "msgtype": "miniprogram",
+        "miniprogram": {
+            "title": "消息标题",
+            "pic_media_id": "MEDIA_ID",
+            "appid": "wx8bd80126147dfAAA",
+            "page": "/path/index.html"
+        }
+    }, {
+        "msgtype": "video",
+        "video": {
+            "media_id": "MEDIA_ID"
+        }
+    }]
+}
      * 参数说明:
      *
      * 参数 必须 说明
@@ -1118,7 +1131,10 @@ class ExternalContact
      * external_userid 否 客户的外部联系人id列表，仅在chat_type为single时有效，不可与sender同时为空，最多可传入1万个客户
      * sender 否 发送企业群发消息的成员userid，当类型为发送给客户群时必填
      * text.content 否 消息文本内容，最多4000个字节
+     * attachments	否	附件，最多支持添加9个附件
+     * attachments.msgtype	是	附件类型，可选image、link、miniprogram或者video
      * image.media_id 是 图片的media_id
+     * image.pic_url 否	图片的链接，仅可使用上传图片接口得到的链接
      * link.title 是 图文消息标题
      * link.picurl 否 图文消息封面的url
      * link.desc 否 图文消息的描述，最多512个字节
@@ -1127,10 +1143,11 @@ class ExternalContact
      * miniprogram.pic_media_id 是 小程序消息封面的mediaid，封面图建议尺寸为520*416
      * miniprogram.appid 是 小程序appid，必须是关联到企业的小程序应用
      * miniprogram.page 是 小程序page路径
-     * text、image、link和miniprogram四者不能同时为空；
+     * video.media_id	是	视频的media_id，可以通过素材管理接口获得
+     * text和attachments不能同时为空；
      * text与另外三者可以同时发送，此时将会以两条消息的形式触达客户
-     * image、link和miniprogram只能有一个，如果三者同时填，则按image、link、miniprogram的优先顺序取参，也就是说，如果image与link同时传值，则只有image生效。
-     * media_id可以通过素材管理接口获得。
+     * attachments中每个附件信息必须与msgtype一致，例如，msgtype指定为image，则需要填写image.pic_url或者image.media_id，否则会报错。
+     * media_id和pic_url只需填写一个，两者同时填写时使用media_id，二者不可同时为空。
      *
      * 权限说明:
      *
@@ -1219,33 +1236,49 @@ class ExternalContact
      * 请求示例
      *
      * {
-     * "welcome_code":"CALLBACK_CODE",
-     * "text": {
-     * "content":"文本消息内容"
-     * },
-     * "image": {
-     * "media_id": "MEDIA_ID"
-     * },
-     * "link": {
-     * "title": "消息标题",
-     * "picurl": "https://example.pic.com/path",
-     * "desc": "消息描述",
-     * "url": "https://example.link.com/path"
-     * },
-     * "miniprogram": {
-     * "title": "消息标题",
-     * "pic_media_id": "MEDIA_ID",
-     * "appid": "wx8bd80126147dfAAA",
-     * "page": "/path/index"
-     * }
-     * }
+    "welcome_code": "CALLBACK_CODE",
+    "text": {
+        "content": "文本消息内容"
+    },
+    "attachments": [{
+        "msgtype": "image",
+        "image": {
+            "media_id": "MEDIA_ID",
+            "pic_url": "http://p.qpic.cn/pic_wework/3474110808/7a6344sdadfwehe42060/0"
+        }
+    }, {
+        "msgtype": "link",
+        "link": {
+            "title": "消息标题",
+            "picurl": "https://example.pic.com/path",
+            "desc": "消息描述",
+            "url": "https://example.link.com/path"
+        }
+    }, {
+        "msgtype": "miniprogram",
+        "miniprogram": {
+            "title": "消息标题",
+            "pic_media_id": "MEDIA_ID",
+            "appid": "wx8bd80126147dfAAA",
+            "page": "/path/index.html"
+        }
+    }, {
+        "msgtype": "video",
+        "video": {
+            "media_id": "MEDIA_ID"
+        }
+    }]
+}
      * 参数说明:
      *
      * 参数 必须 说明
      * access_token 是 调用接口凭证
      * welcome_code 是 通过添加外部联系人事件推送给企业的发送欢迎语的凭证，有效期为20秒
      * text.content 否 消息文本内容,最长为4000字节
+     * attachments	否	附件，最多可添加9个附件
+     * attachments.msgtype	是	附件类型，可选image、link、miniprogram或者video
      * image.media_id 是 图片的media_id
+     * image.pic_url	否	图片的链接，仅可使用上传图片接口得到的链接
      * link.title 是 图文消息标题，最长为128字节
      * link.picurl 否 图文消息封面的url
      * link.desc 否 图文消息的描述，最长为512字节
@@ -1254,10 +1287,11 @@ class ExternalContact
      * miniprogram.pic_media_id 是 小程序消息封面的mediaid，封面图建议尺寸为520*416
      * miniprogram.appid 是 小程序appid，必须是关联到企业的小程序应用
      * miniprogram.page 是 小程序page路径
-     * text、image、link和miniprogram四者不能同时为空；
-     * text与另外三者可以同时发送，此时将会以两条消息的形式触达客户
-     * image、link和miniprogram只能有一个，如果三者同时填，则按image、link、miniprogram的优先顺序取参，也就是说，如果image与link同时传值，则只有image生效。
-     * media_id可以通过素材管理接口获得。
+     * video.media_id	是	视频的media_id，可以通过素材管理接口获得
+     * text和attachments不能同时为空；
+     * text与附件信息可以同时发送，此时将会以多条消息的形式触达客户
+     * attachments中每个附件信息必须与msgtype一致，例如，msgtype指定为image，则需要填写image.pic_url或者image.media_id，否则会报错。
+     * media_id和pic_url只需填写一个，两者同时填写时使用media_id，二者不可同时为空。
      *
      * 权限说明:
      *
