@@ -36,7 +36,7 @@ class Helpers
     public static function paraFilter($para)
     {
         $para_filter = array();
-        while (list($key, $val) = each($para)) {
+        foreach ($para as $key => $val) {
             if (strtolower(trim($key)) === "sign" || trim($val) === "")
                 continue;
             else
@@ -67,7 +67,7 @@ class Helpers
     public static function createLinkstring($para)
     {
         $arg = "";
-        while (list($key, $val) = each($para)) {
+        foreach ($para as $key => $val) {
             $arg .= $key . "=" . $val . "&";
         }
         // 去掉最后一个&字符
@@ -84,7 +84,7 @@ class Helpers
     public static function createLinkstringUrlencode($para)
     {
         $arg = "";
-        while (list($key, $val) = each($para)) {
+        foreach ($para as $key => $val) {
             $arg .= $key . "=" . rawurlencode($val) . "&";
         }
         // 去掉最后一个&字符
