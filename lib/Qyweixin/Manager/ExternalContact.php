@@ -544,7 +544,7 @@ class ExternalContact
 	 * errmsg 对返回码的文本描述内容
 	 * external_userid 外部联系人的userid列表
 	 */
-	public function list($userid)
+	public function getExternalcontactList($userid)
 	{
 		$params = array();
 		$params['userid'] = $userid;

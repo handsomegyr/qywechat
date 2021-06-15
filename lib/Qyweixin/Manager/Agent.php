@@ -133,7 +133,7 @@ class Agent
      * name String 企业应用名称
      * square_logo_url String 企业应用方形头像url
      */
-    public function list()
+    public function getAgentList()
     {
         $params = array();
         $rst = $this->_request->get($this->_url . 'list', $params);

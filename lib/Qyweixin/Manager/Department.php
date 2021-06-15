@@ -212,7 +212,7 @@ class Department
      * parentid 父部门id。根部门为1
      * order 在父部门中的次序值。order值大的排序靠前。值范围是[0, 2^32)
      */
-    public function list($id = 0)
+    public function getDepartmentList($id = 0)
     {
         $params = array();
         if (!empty($id)) {

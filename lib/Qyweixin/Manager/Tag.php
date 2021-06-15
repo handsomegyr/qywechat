@@ -371,7 +371,7 @@ class Tag
      * tagid 标签id
      * tagname 标签名
      */
-    public function list()
+    public function getTagList()
     {
         $params = array();
         $rst = $this->_request->get($this->_url . 'list', $params);

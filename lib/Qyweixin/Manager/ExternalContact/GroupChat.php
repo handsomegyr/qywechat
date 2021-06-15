@@ -88,7 +88,7 @@ class GroupChat
      * 2 - 离职继承中
      * 3 - 离职继承完成
      */
-    public function list($status_filter = 0, $owner_filter = array(), $offset = 0, $limit = 1000)
+    public function getGroupchatList($status_filter = 0, $owner_filter = array(), $offset = 0, $limit = 1000)
     {
         $params = array();
         $params['status_filter'] = $status_filter;
