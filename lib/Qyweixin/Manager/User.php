@@ -958,4 +958,47 @@ class User
         $rst = $this->_request->post($this->_url . 'get_active_stat', $params);
         return $this->_client->rst($rst);
     }
+
+    /**
+     * 手机号获取userid
+     * 通过手机号获取其所对应的userid。
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/user/getuserid?access_token=ACCESS_TOKEN
+     * 请求包体：
+     * {
+     *    "mobile": "13430388888"
+     * }
+     * 参数说明：
+     * 
+     * 参数	必须	说明
+     * access_token	是	调用接口凭证，授权企业的token（通过获取企业凭证获取）或上游获取的下游企业的token（通过获取下级/下游企业的access_token获取）
+     * mobile	是	用户在企业微信通讯录中的手机号码。长度为5~32个字节
+     *  
+     * 权限说明：
+     * 
+     * 应用须拥有指定成员的查看权限。
+     * 
+     * 返回结果：
+     * 
+     * {
+     * 	"errcode": 0,
+     * 	"errmsg": "ok",
+     * 	"userid": "zhangsan"
+     * }
+     * 参数说明：
+     * 
+     * 参数	说明
+     * errcode	返回码
+     * errmsg	对返回码的文本描述内容
+     * userid	成员UserID。对应管理端的帐号，企业内必须唯一。不区分大小写，长度为1~64个字节
+     * 更多说明：
+     * 请确保手机号的正确性，若出错的次数较多，会导致1天不可调用。
+     */
+    public function getUserId($mobile)
+    {
+        $params = array();
+        $params['mobile'] = $mobile;
+        $rst = $this->_request->get($this->_url . 'getuserid', $params);
+        return $this->_client->rst($rst);
+    }
 }
