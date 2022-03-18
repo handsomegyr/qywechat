@@ -33,7 +33,7 @@ class Oa
      *
      * @return \Qyweixin\Manager\Oa\Calendar
      */
-    public function getGroupChatManager()
+    public function getCalendarManager()
     {
         return new Calendar($this->_client);
     }

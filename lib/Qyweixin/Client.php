@@ -29,6 +29,7 @@ use Qyweixin\Manager\MsgAudit;
 use Qyweixin\Manager\Living;
 use Qyweixin\Manager\Health;
 use Qyweixin\Manager\Linkedcorp;
+use Qyweixin\Manager\Kf;
 
 class Client
 {
@@ -341,6 +342,16 @@ class Client
     public function getHealthManager()
     {
         return new Health($this);
+    }
+
+    /**
+     * 获取微信客服管理器
+     *
+     * @return \Qyweixin\Manager\Kf
+     */
+    public function getKfManager()
+    {
+        return new Kf($this);
     }
 
     /**
