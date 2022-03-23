@@ -31,7 +31,7 @@ class Mpnews extends \Qyweixin\Model\Message\Base
 
         if (!empty($this->articles)) {
             foreach ($this->articles as $article) {
-                $params[$this->msgtype]['articles'][] = $article->getParams();
+                $params[$this->msgtype]['articles'][] = $article;
             }
         }
 
