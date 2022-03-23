@@ -145,4 +145,88 @@ class Msg
         $rst = $this->_request->post($this->_url . 'add', $params);
         return $this->_client->rst($rst);
     }
+
+    /**
+     * 读取消息
+     * 微信客户发送的消息、接待人员在企业微信回复的消息、发送消息接口发送失败事件（如被用户拒收）、客户点击菜单消息的回复消息，可以通过该接口获取具体的消息内容和事件。不支持读取通过发送消息接口发送的消息。
+     * 支持的消息类型：文本、图片、语音、视频、文件、位置、链接、名片、小程序、菜单、事件。
+     *
+     * 接口定义
+     * 请求方式: POST(HTTPS)
+     *
+     * 请求地址: https://qyapi.weixin.qq.com/cgi-bin/kf/sync_msg?access_token=ACCESS_TOKEN
+     *
+     * 请求示例
+     *
+     * {
+     * "cursor": "4gw7MepFLfgF2VC5npN",
+     * "token": "ENCApHxnGDNAVNY4AaSJKj4Tb5mwsEMzxhFmHVGcra996NR",
+     * "limit": 1000,
+     * "voice_format": 0
+     * }
+     * 参数说明:
+     *
+     * 参数 必须 类型 说明
+     * access_token 是 string 调用接口凭证
+     * cursor 否 string 上一次调用时返回的next_cursor，第一次拉取可以不填。
+     * 不多于64字节
+     * token 否 string 回调事件返回的token字段，10分钟内有效；可不填，如果不填接口有严格的频率限制。
+     * 不多于128字节
+     * limit 否 uint32 期望请求的数据量，默认值和最大值都为1000。
+     * 注意：可能会出现返回条数少于limit的情况，需结合返回的has_more字段判断是否继续请求。
+     * voice_format 否 uint32 语音消息类型，0-Amr 1-Silk，默认0。可通过该参数控制返回的语音格式，开发者可按需选择自己程序支持的一种格式
+     * 权限说明:
+     *
+     * 企业需要使用“微信客服”secret所获取的accesstoken来调用（accesstoken如何获取？），同时开启“会话消息管理”开关
+     * 第三方应用需具有“微信客服->管理帐号、分配会话和收发消息”权限
+     * 代开发自建应用需具有“微信客服->管理帐号、分配会话和收发消息”权限
+     *
+     *
+     * 返回结果:
+     *
+     * {
+     * "errcode": 0,
+     * "errmsg": "ok",
+     * "next_cursor": "4gw7MepFLfgF2VC5npN",
+     * "has_more": 1,
+     * "msg_list": [
+     * {
+     * "msgid": "from_msgid_4622416642169452483",
+     * "open_kfid": "wkAJ2GCAAASSm4_FhToWMFea0xAFfd3Q",
+     * "external_userid": "wmAJ2GCAAAme1XQRC-NI-q0_ZM9ukoAw",
+     * "send_time": 1615478585,
+     * "origin": 3,
+     * "servicer_userid": "Zhangsan",
+     * "msgtype": "MSG_TYPE"
+     * }
+     * ]
+     * }
+     * 参数说明:
+     *
+     * 参数 类型 说明
+     * errcode int32 返回码
+     * errmsg string 错误码描述
+     * next_cursor string 下次调用带上该值，则从当前的位置继续往后拉，以实现增量拉取。
+     * 强烈建议对改该字段入库保存，每次请求读取带上，请求结束后更新。避免因意外丢，导致必须从头开始拉取，引起消息延迟。
+     * has_more uint32 是否还有更多数据。0-否；1-是。
+     * 不能通过判断msg_list是否空来停止拉取，可能会出现has_more为1，而msg_list为空的情况
+     * msg_list obj[] 消息列表
+     * msg_list.msgid string 消息ID
+     * msg_list.open_kfid string 客服帐号ID（msgtype为event，该字段不返回）
+     * msg_list.external_userid string 客户UserID（msgtype为event，该字段不返回）
+     * msg_list.send_time uint64 消息发送时间
+     * msg_list.origin uint32 消息来源。3-微信客户发送的消息 4-系统推送的事件消息 5-接待人员在企业微信客户端发送的消息
+     * msg_list.servicer_userid string 从企业微信给客户发消息的接待人员userid（msgtype为event，该字段不返回）
+     * msg_list.msgtype string 对不同的msgtype，有相应的结构描述，下面进一步说明
+     */
+    public function syncMsg($token, $limit = 1000, $voice_format = 0, $cursor = "")
+    {
+        $params = array();
+        $params['cursor'] = $cursor;
+        $params['token'] = $token;
+        $params['limit'] = $limit;
+        $params['voice_format'] = $voice_format;
+        $rst = $this->_request->post($this->_url . 'sync_msg', $params);
+        return $this->_client->rst($rst);
+    }
 }
