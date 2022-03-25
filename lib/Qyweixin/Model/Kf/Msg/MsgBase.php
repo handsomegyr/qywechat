@@ -24,13 +24,6 @@ class MsgBase extends \Qyweixin\Model\Base
     public function getParams()
     {
         $params = array();
-
-        if ($this->isNotNull($this->touser)) {
-            $params['touser'] = $this->touser;
-        }
-        if ($this->isNotNull($this->open_kfid)) {
-            $params['open_kfid'] = $this->open_kfid;
-        }
         if ($this->isNotNull($this->msgid)) {
             $params['msgid'] = $this->msgid;
         }

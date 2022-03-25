@@ -142,7 +142,7 @@ class Msg
     {
         $params = $msg->getParams();
         $params['code'] = $code;
-        $rst = $this->_request->post($this->_url . 'add', $params);
+        $rst = $this->_request->post($this->_url . 'send_msg_on_event', $params);
         return $this->_client->rst($rst);
     }
 
