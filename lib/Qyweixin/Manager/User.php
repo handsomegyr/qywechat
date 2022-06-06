@@ -998,7 +998,7 @@ class User
     {
         $params = array();
         $params['mobile'] = $mobile;
-        $rst = $this->_request->get($this->_url . 'getuserid', $params);
+        $rst = $this->_request->post($this->_url . 'getuserid', $params);
         return $this->_client->rst($rst);
     }
 }

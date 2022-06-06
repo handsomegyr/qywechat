@@ -309,8 +309,12 @@ class Servicer
     public function getServicerStatistic($open_kfid, $servicer_userid, int $start_time, int $end_time)
     {
         $params = array();
-        $params['open_kfid'] = $open_kfid;
-        $params['servicer_userid'] = $servicer_userid;
+        if (!empty($open_kfid)) {
+            $params['open_kfid'] = $open_kfid;
+        }
+        if (!empty($servicer_userid)) {
+            $params['servicer_userid'] = $servicer_userid;
+        }
         $params['start_time'] = $start_time;
         $params['end_time'] = $end_time;
         $rst = $this->_request->post('https://qyapi.weixin.qq.com/cgi-bin/kf/get_servicer_statistic', $params);

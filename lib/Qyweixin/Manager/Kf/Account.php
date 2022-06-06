@@ -359,7 +359,9 @@ class Account
     public function getCorpStatistic($open_kfid, int $start_time, int $end_time)
     {
         $params = array();
-        $params['open_kfid'] = $open_kfid;
+        if(!empty($open_kfid)){
+            $params['open_kfid'] = $open_kfid;
+        }
         $params['start_time'] = $start_time;
         $params['end_time'] = $end_time;
 

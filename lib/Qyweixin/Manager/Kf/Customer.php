@@ -198,7 +198,7 @@ class Customer
      * errcode int 返回码
      * errmsg string 错误码描述
      */
-    public function cancelUpgradeService($open_kfid, $external_userid,)
+    public function cancelUpgradeService($open_kfid, $external_userid)
     {
         $params = array();
         $params['open_kfid'] = $open_kfid;
