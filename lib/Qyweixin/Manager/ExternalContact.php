@@ -4,6 +4,7 @@ namespace Qyweixin\Manager;
 
 use Qyweixin\Client;
 use Qyweixin\Manager\ExternalContact\Moment;
+use Qyweixin\Manager\ExternalContact\CorpTag;
 use Qyweixin\Manager\ExternalContact\GroupMsg;
 use Qyweixin\Manager\ExternalContact\GroupChat;
 use Qyweixin\Manager\ExternalContact\ContactWay;
@@ -77,6 +78,15 @@ class ExternalContact
 	public function getCustomerStrategyManager()
 	{
 		return new CustomerStrategy($this->_client);
+	}
+	/**
+	 * 获取企业标签库对象
+	 *
+	 * @return \Qyweixin\Manager\ExternalContact\CorpTag
+	 */
+	public function getCorpTagManager()
+	{
+		return new CorpTag($this->_client);
 	}
 
 	/**
@@ -307,6 +317,163 @@ class ExternalContact
 	}
 
 	/**
+	 * 批量获取客户详情
+	 * 企业/第三方可通过此接口获取指定成员添加的客户信息列表。
+	 *
+	 * 请求方式：POST（HTTPS）
+	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/batch/get_by_user?access_token=ACCESS_TOKEN
+	 *
+	 * 请求示例：
+	 *
+	 * {
+	 * "userid_list":
+	 * [
+	 * "zhangsan",
+	 * "lisi"
+	 * ],
+	 * "cursor":"",
+	 * "limit":100
+	 * }
+	 *
+	 *
+	 * 参数说明：
+	 *
+	 * 参数 必须 说明
+	 * access_token 是 调用接口凭证
+	 * userid_list 是 企业成员的userid列表，字符串类型，最多支持100个
+	 * cursor 否 用于分页查询的游标，字符串类型，由上一次调用返回，首次调用可不填
+	 * limit 否 返回的最大记录数，整型，最大值100，默认值50，超过最大值时取最大值
+	 *
+	 *
+	 * 权限说明：
+	 *
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）；
+	 * 第三方应用需具有“企业客户权限->客户基础信息”权限
+	 * 第三方/自建应用调用此接口时，userid需要在相关应用的可见范围内。
+	 * 规则组标签仅可通过“客户联系”获取。
+	 * 返回结果：
+	 *
+	 * {
+	 * "errcode": 0,
+	 * "errmsg": "ok",
+	 * "external_contact_list":
+	 * [
+	 * {
+	 * "external_contact":
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHAAA",
+	 * "name":"李四",
+	 * "position":"Manager",
+	 * "avatar":"http://p.qlogo.cn/bizmail/IcsdgagqefergqerhewSdage/0",
+	 * "corp_name":"腾讯",
+	 * "corp_full_name":"腾讯科技有限公司",
+	 * "type":2,
+	 * "gender":1,
+	 * "unionid":"ozynqsulJFCZ2z1aYeS8h-nuasdAAA",
+	 * "external_profile":
+	 * {
+	 * "external_attr":
+	 * [
+	 * {
+	 * "type":0,
+	 * "name":"文本名称",
+	 * "text":
+	 * {
+	 * "value":"文本"
+	 * }
+	 * },
+	 * {
+	 * "type":1,
+	 * "name":"网页名称",
+	 * "web":
+	 * {
+	 * "url":"http://www.test.com",
+	 * "title":"标题"
+	 * }
+	 * },
+	 * {
+	 * "type":2,
+	 * "name":"测试app",
+	 * "miniprogram":
+	 * {
+	 * "appid": "wx8bd80126147df384",
+	 * "pagepath": "/index",
+	 * "title": "my miniprogram"
+	 * }
+	 * }
+	 * ]
+	 * }
+	 * },
+	 * "follow_info":
+	 * {
+	 * "userid":"rocky",
+	 * "remark":"李部长",
+	 * "description":"对接采购事务",
+	 * "createtime":1525779812,
+	 * "tag_id":["etAJ2GCAAAXtWyujaWJHDDGi0mACHAAA"],
+	 * "remark_corp_name":"腾讯科技",
+	 * "remark_mobiles":
+	 * [
+	 * "13800000001",
+	 * "13000000002"
+	 * ],
+	 * "oper_userid":"rocky",
+	 * "add_way":10,
+	 * "wechat_channels": {
+	 * "nickname": "视频号名称",
+	 * "source": 1
+	 * }
+	 * }
+	 * },
+	 * {
+	 * "external_contact":
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHBBB",
+	 * "name":"王五",
+	 * "position":"Engineer",
+	 * "avatar":"http://p.qlogo.cn/bizmail/IcsdgagqefergqerhewSdage/0",
+	 * "corp_name":"腾讯",
+	 * "corp_full_name":"腾讯科技有限公司",
+	 * "type":2,
+	 * "gender":1,
+	 * "unionid":"ozynqsulJFCZ2asdaf8h-nuasdAAA"
+	 * },
+	 * "follow_info":
+	 * {
+	 * "userid":"lisi",
+	 * "remark":"王助理",
+	 * "description":"采购问题咨询",
+	 * "createtime":1525881637,
+	 * "tag_id":["etAJ2GCAAAXtWyujaWJHDDGi0mACHAAA","stJHDDGi0mAGi0mACHBBByujaW"],
+	 * "state":"外联二维码1",
+	 * "oper_userid":"woAJ2GCAAAd1asdasdjO4wKmE8AabjBBB",
+	 * "add_way":3
+	 * }
+	 * }
+	 * ],
+	 * "next_cursor":"r9FqSqsI8fgNbHLHE5QoCP50UIg2cFQbfma3l2QsmwI"
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * external_contact_list.external_contact 客户的基本信息，可以参考获取客户详情
+	 * external_contact_list.follow_info 企业成员客户跟进信息，可以参考获取客户详情，但标签信息只会返回企业标签和规则组标签的tag_id，个人标签将不再返回
+	 * next_cursor 分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
+	 */
+	public function batchGetByUser(array $userid_list, $cursor = "", $limit = 100)
+	{
+		$params = array();
+		$params['userid_list'] = $userid_list;
+		$params['cursor'] = $cursor;
+		$params['limit'] = $limit;
+
+		$rst = $this->_request->post($this->_url . 'batch/get_by_user', $params);
+		return $this->_client->rst($rst);
+	}
+
+	/**
 	 * 获取客户详情
 	 * 调试工具
 	 * 企业可通过此接口，根据外部联系人的userid（如何获取?），拉取客户详情。
@@ -319,7 +486,7 @@ class ExternalContact
 	 * 参数 必须 说明
 	 * access_token 是 调用接口凭证
 	 * external_userid 是 外部联系人的userid，注意不是企业成员的帐号
-	 * cursor	否	上次请求返回的next_cursor
+	 * cursor 否 上次请求返回的next_cursor
 	 * 权限说明：
 	 *
 	 * 企业需要使用系统应用“客户联系”或配置到“可调用应用”列表中的自建应用的secret所获取的accesstoken来调用（accesstoken如何获取？）；
@@ -426,7 +593,7 @@ class ExternalContact
 	 * follow_user.state 该成员添加此客户的渠道，由用户通过创建「联系我」方式指定
 	 * 如果外部联系人为微信用户，则返回外部联系人的名称为其微信昵称；如果外部联系人为企业微信用户，则会按照以下优先级顺序返回：此外部联系人或管理员设置的昵称、认证的实名和账号名称。
 	 * 关于返回unionid，如果是第三方应用调用该接口，则返回的unionid是该第三方服务商所关联的微信开放者帐号下的unionid。也就是说，同一个企业客户，企业自己调用，与第三方服务商调用，所返回的unionid不同；不同的服务商调用，所返回的unionid也不同。
-	 * next_cursor	分页的cursor，当跟进人多于500人时返回
+	 * next_cursor 分页的cursor，当跟进人多于500人时返回
 	 */
 	public function get($external_userid, $cursor = "")
 	{
@@ -502,291 +669,34 @@ class ExternalContact
 
 	/**
 	 * 获取企业标签库
-	 * 企业可通过此接口获取企业客户标签详情。
-	 *
-	 *
-	 *
-	 * 请求方式: POST(HTTP)
-	 *
-	 * 请求地址:https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_corp_tag_list?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例:
-	 *
-	 * {
-	 * "tag_id":
-	 * [
-	 * "etXXXXXXXXXX",
-	 * "etYYYYYYYYYY"
-	 * ],
-	 * "group_id":
-	 * [
-	 * "etZZZZZZZZZZZZZ",
-	 * "etYYYYYYYYYYYYY"
-	 * ]
-	 * }
-	 *
-	 *
-	 * 参数说明:
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * tag_id 否 要查询的标签id
-	 * group_id 否 要查询的标签组id，返回该标签组以及其下的所有标签信息
-	 * 若tag_id和group_id均为空，则返回所有标签。
-	 * 同时传递tag_id和group_id时，忽略tag_id，仅以group_id作为过滤条件。
-	 * 返回结果:
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok",
-	 * "tag_group": [{
-	 * "group_id": "TAG_GROUPID1",
-	 * "group_name": "GOURP_NAME",
-	 * "create_time": 1557838797,
-	 * "order": 1,
-	 * "deleted": false,
-	 * "tag": [{
-	 * "id": "TAG_ID1",
-	 * "name": "NAME1",
-	 * "create_time": 1557838797,
-	 * "order": 1,
-	 * "deleted": false
-	 * },
-	 * {
-	 * "id": "TAG_ID2",
-	 * "name": "NAME2",
-	 * "create_time": 1557838797,
-	 * "order": 2,
-	 * "deleted": true
-	 * }
-	 * ]
-	 * }]
-	 * }
-	 * 参数说明:
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
-	 * tag_group 标签组列表
-	 * tag_group.group_id 标签组id
-	 * tag_group.group_name 标签组名称
-	 * tag_group.create_time 标签组创建时间
-	 * tag_group.order 标签组排序的次序值，order值大的排序靠前。有效的值范围是[0, 2^32)
-	 * tag_group.deleted 标签组是否已经被删除，只在指定tag_id进行查询时返回
-	 * tag_group.tag 标签组内的标签列表
-	 * tag_group.tag.id 标签id
-	 * tag_group.tag.name 标签名称
-	 * tag_group.tag.create_time 标签创建时间
-	 * tag_group.tag.order 标签排序的次序值，order值大的排序靠前。有效的值范围是[0, 2^32)
-	 * tag_group.tag.deleted 标签是否已经被删除，只在指定tag_id/group_id进行查询时返回
 	 */
 	public function getCorpTagList(array $tag_id = array(), array $group_id = array())
 	{
-		$params = array();
-		if (!empty($tag_id)) {
-			$params['tag_id'] = $tag_id;
-		}
-		if (!empty($group_id)) {
-			$params['group_id'] = $group_id;
-		}
-		$rst = $this->_request->post($this->_url . 'get_corp_tag_list', $params);
-		return $this->_client->rst($rst);
+		return $this->getCorpTagManager()->getList($tag_id, $group_id);
 	}
 
 	/**
 	 * 添加企业客户标签
-	 * 企业可通过此接口向客户标签库中添加新的标签组和标签。
-	 * 暂不支持第三方调用。
-	 *
-	 * 请求方式: POST(HTTP)
-	 *
-	 * 请求地址:https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_corp_tag?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例:
-	 *
-	 * {
-	 * "group_id": "GROUP_ID",
-	 * "group_name": "GROUP_NAME",
-	 * "order": 1,
-	 * "tag": [{
-	 * "name": "TAG_NAME_1",
-	 * "order": 1
-	 * },
-	 * {
-	 * "name": "TAG_NAME_2",
-	 * "order": 2
-	 * }
-	 * ],
-	 * "agentid" : 1000014
-	 * }
-	 * 参数说明:
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * group_id 否 标签组id
-	 * group_name 否 标签组名称，最长为30个字符
-	 * order 否 标签组次序值。order值大的排序靠前。有效的值范围是[0, 2^32)
-	 * tag.name 是 添加的标签名称，最长为30个字符
-	 * tag.order 否 标签次序值。order值大的排序靠前。有效的值范围是[0, 2^32)
-	 * 注意:
-	 * 如果要向指定的标签组下添加标签，需要填写group_id参数；如果要创建一个全新的标签组以及标签，则需要通过group_name参数指定新标签组名称，如果填写的groupname已经存在，则会在此标签组下新建标签。
-	 * 如果填写了group_id参数，则group_name和标签组的order参数会被忽略。
-	 * 不支持创建空标签组。
-	 * 标签组内的标签不可同名，如果传入多个同名标签，则只会创建一个。
-	 * agentid 否 授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
-	 *
-	 * 返回结果:
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok",
-	 * "tag_group": {
-	 * "group_id": "TAG_GROUPID1",
-	 * "group_name": "GOURP_NAME",
-	 * "create_time": 1557838797,
-	 * "order": 1,
-	 * "tag": [{
-	 * "id": "TAG_ID1",
-	 * "name": "NAME1",
-	 * "create_time": 1557838797,
-	 * "order": 1
-	 * },
-	 * {
-	 * "id": "TAG_ID2",
-	 * "name": "NAME2",
-	 * "create_time": 1557838797,
-	 * "order": 2
-	 * }
-	 * ]
-	 * }
-	 * }
-	 * 参数说明:
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
-	 * tag_group.group_id 标签组id
-	 * tag_group.group_name 标签组名称
-	 * tag_group.create_time 标签组创建时间
-	 * tag_group.order 标签组次序值。order值大的排序靠前。有效的值范围是[0, 2^32)
-	 * tag_group.tag 标签组内的标签列表
-	 * tag_group.tag.id 新建标签id
-	 * tag_group.tag.name 新建标签名称
-	 * tag_group.tag.create_time 标签创建时间
-	 * tag_group.tag.order 标签次序值。order值大的排序靠前。有效的值范围是[0, 2^32)
 	 */
 	public function addCorpTag(\Qyweixin\Model\ExternalContact\CorpTag $corpTag)
 	{
-		$params = $corpTag->getParams();
-		$rst = $this->_request->post($this->_url . 'add_corp_tag', $params);
-		return $this->_client->rst($rst);
+		return $this->getCorpTagManager()->add($corpTag);
 	}
 
 	/**
 	 * 编辑企业客户标签
-	 * 企业可通过此接口编辑客户标签/标签组的名称或次序值。
-	 * 暂不支持第三方调用。
-	 *
-	 * 请求方式: POST(HTTP)
-	 *
-	 * 请求地址:https://qyapi.weixin.qq.com/cgi-bin/externalcontact/edit_corp_tag?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例:
-	 *
-	 * {
-	 * "id": "TAG_ID",
-	 * "name": "NEW_TAG_NAME",
-	 * "order": 1
-	 * "agentid" : 1000014
-	 * }
-	 * 参数说明:
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * id 是 标签或标签组的id列表
-	 * name 否 新的标签或标签组名称，最长为30个字符
-	 * order 否 标签/标签组的次序值。order值大的排序靠前。有效的值范围是[0, 2^32)注意:修改后的标签组不能和已有的标签组重名，标签也不能和同一标签组下的其他标签重名。
-	 * agentid 否 授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
-	 *
-	 * 返回结果:
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok"
-	 * }
-	 * 参数说明:
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
 	 */
 	public function editCorpTag(\Qyweixin\Model\ExternalContact\CorpTag $corpTag)
 	{
-		$params = $corpTag->getParams();
-		$rst = $this->_request->post($this->_url . 'edit_corp_tag', $params);
-		return $this->_client->rst($rst);
+		return $this->getCorpTagManager()->edit($corpTag);
 	}
 
 	/**
 	 * 删除企业客户标签
-	 * 企业可通过此接口删除客户标签库中的标签，或删除整个标签组。
-	 * 暂不支持第三方调用。
-	 *
-	 * 请求方式: POST(HTTP)
-	 *
-	 * 请求地址:https://qyapi.weixin.qq.com/cgi-bin/externalcontact/del_corp_tag?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例:
-	 *
-	 * {
-	 * "tag_id": [
-	 * "TAG_ID_1",
-	 * "TAG_ID_2"
-	 * ],
-	 * "group_id": [
-	 * "GROUP_ID_1",
-	 * "GROUP_ID_2"
-	 * ],
-	 * "agentid" : 1000014
-	 * }
-	 * 参数说明:
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * tag_id 否 标签的id列表
-	 * group_id 否 标签组的id列表
-	 * tag_id和group_id不可同时为空。* 如果一个标签组下所有的标签均被删除，则标签组会被自动删除。
-	 * agentid 否 授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
-	 *
-	 * 返回结果:
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok"
-	 * }
-	 * 参数说明:
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
 	 */
 	public function deleteCorpTag($tag_id, $group_id, $agentid = "")
 	{
-		$params = array();
-		if (empty($tag_id) && empty($group_id)) {
-			throw new \Exception('tag_id和group_id不可同时为空');
-		}
-		if (!empty($tag_id)) {
-			$params['tag_id'] = $tag_id;
-		}
-		if (!empty($group_id)) {
-			$params['group_id'] = $group_id;
-		}
-		if (!empty($agentid)) {
-			$params['agentid'] = $agentid;
-		}
-		$rst = $this->_request->post($this->_url . 'del_corp_tag', $params);
-		return $this->_client->rst($rst);
+		return $this->getCorpTagManager()->del($tag_id, $group_id, $agentid);
 	}
 
 	/**
@@ -1093,123 +1003,6 @@ class ExternalContact
 	{
 		$params = $welcomeMsg->getParams();
 		$rst = $this->_request->post($this->_url . 'send_welcome_msg', $params);
-		return $this->_client->rst($rst);
-	}
-
-	/**
-	 * 获取离职成员的客户列表
-	 * 调试工具
-	 * 企业和第三方可通过此接口，获取所有离职成员的客户列表，并可进一步调用离职成员的外部联系人再分配接口将这些客户重新分配给其他企业成员。
-	 *
-	 * 请求方式：POST（HTTPS）
-	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_unassigned_list?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例：
-	 *
-	 * {
-	 * "page_id":0,
-	 * "page_size":100
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * page_id 否 分页查询，要查询页号，从0开始
-	 * page_size 否 每次返回的最大记录数，默认为1000，最大值为1000
-	 * 注意:返回数据按离职时间的降序排列，当page_id为1，page_size为100时，表示取第101到第200条记录
-	 *
-	 * 权限说明：
-	 *
-	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
-	 * 第三方应用需拥有“企业客户权限”。
-	 * 返回结果：
-	 *
-	 * {
-	 * "errcode":0,
-	 * "errmsg":"ok",
-	 * "info":[
-	 * {
-	 * "handover_userid":"zhangsan",
-	 * "external_userid":"woAJ2GCAAAd4uL12hdfsdasassdDmAAAAA",
-	 * "dimission_time":1550838571
-	 * },
-	 * {
-	 * "handover_userid":"lisi",
-	 * "external_userid":"wmAJ2GCAAAzLTI123ghsdfoGZNqqAAAA",
-	 * "dimission_time":1550661468
-	 * }
-	 * ],
-	 * "is_last":false
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
-	 * info.handover_userid 离职成员的userid
-	 * info.external_userid 外部联系人userid
-	 * info.dimission_time 成员离职时间
-	 * is_last 是否是最后一条记录
-	 */
-	public function getUnassignedList($page_id = 0, $page_size = 1000)
-	{
-		$params = array();
-		$params['page_id'] = $page_id;
-		$params['page_size'] = $page_size;
-		$rst = $this->_request->post($this->_url . 'get_unassigned_list', $params);
-		return $this->_client->rst($rst);
-	}
-
-	/**
-	 * 离职成员的外部联系人再分配
-	 * 调试工具
-	 * 企业可通过此接口，将已离职成员的外部联系人分配给另一个成员接替联系。
-	 *
-	 * 请求方式：POST（HTTPS）
-	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例：
-	 *
-	 * {
-	 * "external_userid": "woAJ2GCAAAXtWyujaWJHDDGi0mACAAAA",
-	 * "handover_userid": "zhangsan",
-	 * "takeover_userid": "lisi"
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * external_userid 是 外部联系人的userid，注意不是企业成员的帐号
-	 * handover_userid 是 离职成员的userid
-	 * takeover_userid 是 接替成员的userid
-	 * external_userid必须是handover_userid的客户（即配置了客户联系功能的成员所添加的联系人）。
-	 *
-	 * 权限说明：
-	 *
-	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-	 * 第三方应用需拥有“企业客户权限”。
-	 * 相关接手的跟进用户必须在此第三方应用或自建应用的可见范围内。
-	 * 接替成员需要配置了客户联系功能。
-	 * 接替成员需要在企业微信激活且已经过实名认证。
-	 * 返回结果：
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok"
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
-	 */
-	public function transfer($external_userid, $handover_userid, $takeover_userid)
-	{
-		$params = array();
-		$params['external_userid'] = $external_userid;
-		$params['handover_userid'] = $handover_userid;
-		$params['takeover_userid'] = $takeover_userid;
-		$rst = $this->_request->post($this->_url . 'transfer', $params);
 		return $this->_client->rst($rst);
 	}
 
@@ -1744,6 +1537,146 @@ class ExternalContact
 	}
 
 	/**
+	 * 获取离职成员的客户列表
+	 * 调试工具
+	 * 企业和第三方可通过此接口，获取所有离职成员的客户列表，并可进一步调用离职成员的外部联系人再分配接口将这些客户重新分配给其他企业成员。
+	 *
+	 * 请求方式：POST（HTTPS）
+	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_unassigned_list?access_token=ACCESS_TOKEN
+	 *
+	 * 请求示例：
+	 *
+	 * {
+	 * "page_id":0,
+	 * "cursor":"",
+	 * "page_size":100
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 必须 说明
+	 * access_token 是 调用接口凭证
+	 * page_id 否 分页查询，要查询页号，从0开始
+	 * page_size 否 每次返回的最大记录数，默认为1000，最大值为1000
+	 * 注意:返回数据按离职时间的降序排列，当page_id为1，page_size为100时，表示取第101到第200条记录
+	 * cursor 否 分页查询游标，字符串类型，适用于数据量较大的情况，如果使用该参数则无需填写page_id，该参数由上一次调用返回
+	 *
+	 * 权限说明：
+	 *
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
+	 * 第三方应用需拥有“企业客户权限”。
+	 * 返回结果：
+	 *
+	 * {
+	 * "errcode":0,
+	 * "errmsg":"ok",
+	 * "info":[
+	 * {
+	 * "handover_userid":"zhangsan",
+	 * "external_userid":"woAJ2GCAAAd4uL12hdfsdasassdDmAAAAA",
+	 * "dimission_time":1550838571
+	 * },
+	 * {
+	 * "handover_userid":"lisi",
+	 * "external_userid":"wmAJ2GCAAAzLTI123ghsdfoGZNqqAAAA",
+	 * "dimission_time":1550661468
+	 * }
+	 * ],
+	 * "is_last":false,
+	 * "next_cursor":"aSfwejksvhToiMMfFeIGZZ"
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * info.handover_userid 离职成员的userid
+	 * info.external_userid 外部联系人userid
+	 * info.dimission_time 成员离职时间
+	 * is_last 是否是最后一条记录
+	 */
+	public function getUnassignedList($page_id = 0, $page_size = 1000, $cursor = "")
+	{
+		$params = array();
+		$params['page_id'] = $page_id;
+		$params['page_size'] = $page_size;
+		$params['cursor'] = $cursor;
+		$rst = $this->_request->post($this->_url . 'get_unassigned_list', $params);
+		return $this->_client->rst($rst);
+	}
+
+	/**
+	 * 分配离职成员的客户
+	 * 企业可通过此接口，分配离职成员的客户给其他成员。
+	 *
+	 * 请求方式：POST（HTTPS）
+	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/resigned/transfer_customer?access_token=ACCESS_TOKEN
+	 *
+	 * 请求示例：
+	 *
+	 * {
+	 * "handover_userid": "zhangsan",
+	 * "takeover_userid": "lisi",
+	 * "external_userid":
+	 * [
+	 * "woAJ2GCAAAXtWyujaWJHDDGi0mACBBBB",
+	 * "woAJ2GCAAAXtWyujaWJHDDGi0mACAAAA"
+	 * ]
+	 *
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 必须 说明
+	 * access_token 是 调用接口凭证
+	 * handover_userid 是 原跟进成员的userid
+	 * takeover_userid 是 接替成员的userid
+	 * external_userid 是 客户的external_userid列表，最多一次转移100个客户
+	 * handover_userid必须是已离职用户。
+	 * external_userid必须是handover_userid的客户（即配置了客户联系功能的成员所添加的联系人）。
+	 *
+	 *
+	 * 权限说明：
+	 *
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+	 * 第三方应用需拥有“企业客户权限->客户联系->离职分配”权限
+	 * 接替成员必须在此第三方应用或自建应用的可见范围内。
+	 * 接替成员需要配置了客户联系功能。
+	 * 接替成员需要在企业微信激活且已经过实名认证。
+	 * 返回结果：
+	 *
+	 * {
+	 * "errcode": 0,
+	 * "errmsg": "ok",
+	 * "customer":
+	 * [
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACBBBB",
+	 * "errcode":0
+	 * },
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACAAAA",
+	 * "errcode":40096
+	 * }
+	 * ]
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * customer.external_userid 客户的external_userid
+	 * customer.errcode 对此客户进行分配的结果, 具体可参考全局错误码, 0表示开始分配流程,待24小时后自动接替,并不代表最终分配成功
+	 */
+	public function resignedTransferCustomer($external_userid, $handover_userid, $takeover_userid)
+	{
+		$params = array();
+		$params['external_userid'] = $external_userid;
+		$params['handover_userid'] = $handover_userid;
+		$params['takeover_userid'] = $takeover_userid;
+		$rst = $this->_request->post($this->_url . 'resigned/transfer_customer', $params);
+		return $this->_client->rst($rst);
+	}
+
+	/**
 	 * 查询客户接替状态
 	 * 企业和第三方可通过此接口查询离职成员的客户分配情况。
 	 *
@@ -1826,159 +1759,55 @@ class ExternalContact
 	}
 
 	/**
-	 * 批量获取客户详情
-	 * 企业/第三方可通过此接口获取指定成员添加的客户信息列表。
+	 * 离职成员的外部联系人再分配
+	 * 调试工具
+	 * 企业可通过此接口，将已离职成员的外部联系人分配给另一个成员接替联系。
 	 *
 	 * 请求方式：POST（HTTPS）
-	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/batch/get_by_user?access_token=ACCESS_TOKEN
+	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer?access_token=ACCESS_TOKEN
 	 *
 	 * 请求示例：
 	 *
 	 * {
-	 * "userid_list":
-	 * [
-	 * "zhangsan",
-	 * "lisi"
-	 * ],
-	 * "cursor":"",
-	 * "limit":100
+	 * "external_userid": "woAJ2GCAAAXtWyujaWJHDDGi0mACAAAA",
+	 * "handover_userid": "zhangsan",
+	 * "takeover_userid": "lisi"
 	 * }
-	 *
-	 *
 	 * 参数说明：
 	 *
 	 * 参数 必须 说明
 	 * access_token 是 调用接口凭证
-	 * userid_list 是 企业成员的userid列表，字符串类型，最多支持100个
-	 * cursor 否 用于分页查询的游标，字符串类型，由上一次调用返回，首次调用可不填
-	 * limit 否 返回的最大记录数，整型，最大值100，默认值50，超过最大值时取最大值
-	 *
+	 * external_userid 是 外部联系人的userid，注意不是企业成员的帐号
+	 * handover_userid 是 离职成员的userid
+	 * takeover_userid 是 接替成员的userid
+	 * external_userid必须是handover_userid的客户（即配置了客户联系功能的成员所添加的联系人）。
 	 *
 	 * 权限说明：
 	 *
-	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）；
-	 * 第三方应用需具有“企业客户权限->客户基础信息”权限
-	 * 第三方/自建应用调用此接口时，userid需要在相关应用的可见范围内。
-	 * 规则组标签仅可通过“客户联系”获取。
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+	 * 第三方应用需拥有“企业客户权限”。
+	 * 相关接手的跟进用户必须在此第三方应用或自建应用的可见范围内。
+	 * 接替成员需要配置了客户联系功能。
+	 * 接替成员需要在企业微信激活且已经过实名认证。
 	 * 返回结果：
 	 *
 	 * {
 	 * "errcode": 0,
-	 * "errmsg": "ok",
-	 * "external_contact_list":
-	 * [
-	 * {
-	 * "external_contact":
-	 * {
-	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHAAA",
-	 * "name":"李四",
-	 * "position":"Manager",
-	 * "avatar":"http://p.qlogo.cn/bizmail/IcsdgagqefergqerhewSdage/0",
-	 * "corp_name":"腾讯",
-	 * "corp_full_name":"腾讯科技有限公司",
-	 * "type":2,
-	 * "gender":1,
-	 * "unionid":"ozynqsulJFCZ2z1aYeS8h-nuasdAAA",
-	 * "external_profile":
-	 * {
-	 * "external_attr":
-	 * [
-	 * {
-	 * "type":0,
-	 * "name":"文本名称",
-	 * "text":
-	 * {
-	 * "value":"文本"
-	 * }
-	 * },
-	 * {
-	 * "type":1,
-	 * "name":"网页名称",
-	 * "web":
-	 * {
-	 * "url":"http://www.test.com",
-	 * "title":"标题"
-	 * }
-	 * },
-	 * {
-	 * "type":2,
-	 * "name":"测试app",
-	 * "miniprogram":
-	 * {
-	 * "appid": "wx8bd80126147df384",
-	 * "pagepath": "/index",
-	 * "title": "my miniprogram"
-	 * }
-	 * }
-	 * ]
-	 * }
-	 * },
-	 * "follow_info":
-	 * {
-	 * "userid":"rocky",
-	 * "remark":"李部长",
-	 * "description":"对接采购事务",
-	 * "createtime":1525779812,
-	 * "tag_id":["etAJ2GCAAAXtWyujaWJHDDGi0mACHAAA"],
-	 * "remark_corp_name":"腾讯科技",
-	 * "remark_mobiles":
-	 * [
-	 * "13800000001",
-	 * "13000000002"
-	 * ],
-	 * "oper_userid":"rocky",
-	 * "add_way":10,
-	 * "wechat_channels": {
-	 * "nickname": "视频号名称",
-	 * "source": 1
-	 * }
-	 * }
-	 * },
-	 * {
-	 * "external_contact":
-	 * {
-	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHBBB",
-	 * "name":"王五",
-	 * "position":"Engineer",
-	 * "avatar":"http://p.qlogo.cn/bizmail/IcsdgagqefergqerhewSdage/0",
-	 * "corp_name":"腾讯",
-	 * "corp_full_name":"腾讯科技有限公司",
-	 * "type":2,
-	 * "gender":1,
-	 * "unionid":"ozynqsulJFCZ2asdaf8h-nuasdAAA"
-	 * },
-	 * "follow_info":
-	 * {
-	 * "userid":"lisi",
-	 * "remark":"王助理",
-	 * "description":"采购问题咨询",
-	 * "createtime":1525881637,
-	 * "tag_id":["etAJ2GCAAAXtWyujaWJHDDGi0mACHAAA","stJHDDGi0mAGi0mACHBBByujaW"],
-	 * "state":"外联二维码1",
-	 * "oper_userid":"woAJ2GCAAAd1asdasdjO4wKmE8AabjBBB",
-	 * "add_way":3
-	 * }
-	 * }
-	 * ],
-	 * "next_cursor":"r9FqSqsI8fgNbHLHE5QoCP50UIg2cFQbfma3l2QsmwI"
+	 * "errmsg": "ok"
 	 * }
 	 * 参数说明：
 	 *
 	 * 参数 说明
 	 * errcode 返回码
 	 * errmsg 对返回码的文本描述内容
-	 * external_contact_list.external_contact 客户的基本信息，可以参考获取客户详情
-	 * external_contact_list.follow_info 企业成员客户跟进信息，可以参考获取客户详情，但标签信息只会返回企业标签和规则组标签的tag_id，个人标签将不再返回
-	 * next_cursor 分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
 	 */
-	public function batchGetByUser(array $userid_list, $cursor = "", $limit = 100)
+	public function transfer($external_userid, $handover_userid, $takeover_userid)
 	{
 		$params = array();
-		$params['userid_list'] = $userid_list;
-		$params['cursor'] = $cursor;
-		$params['limit'] = $limit;
-
-		$rst = $this->_request->post($this->_url . 'batch/get_by_user', $params);
+		$params['external_userid'] = $external_userid;
+		$params['handover_userid'] = $handover_userid;
+		$params['takeover_userid'] = $takeover_userid;
+		$rst = $this->_request->post($this->_url . 'transfer', $params);
 		return $this->_client->rst($rst);
 	}
 }

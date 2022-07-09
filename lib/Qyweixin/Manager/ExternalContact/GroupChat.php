@@ -3,6 +3,7 @@
 namespace Qyweixin\Manager\ExternalContact;
 
 use Qyweixin\Client;
+use Qyweixin\Manager\ExternalContact\GroupChat\JoinWay;
 
 /**
  * 客户群列消息发送
@@ -23,8 +24,17 @@ class GroupChat
     }
 
     /**
+     * 获取客户群「加入群聊」管理对象
+     *
+     * @return \Qyweixin\Manager\ExternalContact\GroupChat\JoinWay
+     */
+    public function getJoinWayManager()
+    {
+        return new JoinWay($this->_client);
+    }
+
+    /**
      * 获取客户群列表
-     * 调试工具
      * 该接口用于获取配置过客户群管理的客户群列表。
      *
      * 请求方式：POST（HTTPS）
@@ -33,32 +43,36 @@ class GroupChat
      * {
      * "status_filter": 0,
      * "owner_filter": {
-     * "userid_list": ["samueldeng"],
-     * "partyid_list": [7]
+     * "userid_list": ["abel"]
      * },
-     * "offset": 0,
-     * "limit": 100
+     * "cursor" : "r9FqSqsI8fgNbHLHE5QoCP50UIg2cFQbfma3l2QsmwI",
+     * "limit" : 10
      * }
      * 参数说明：
      *
      * 参数 必须 说明
      * access_token 是 调用接口凭证
-     * status_filter 否 群状态过滤。
-     * 0 - 普通列表
+     * status_filter 否 客户群跟进状态过滤。
+     * 0 - 所有列表(即不过滤)
      * 1 - 离职待继承
      * 2 - 离职继承中
      * 3 - 离职继承完成
      *
      * 默认为0
-     * owner_filter 否 群主过滤。如果不填，表示获取全部群主的数据
-     * userid_list 否 用户ID列表。最多100个
-     * partyid_list 否 部门ID列表。最多100个
-     * offset 是 分页，偏移量
+     * owner_filter 否 群主过滤。
+     * 如果不填，表示获取应用可见范围内全部群主的数据（但是不建议这么用，如果可见范围人数超过1000人，为了防止数据包过大，会报错 81017）
+     * owner_filter.userid_list 否 用户ID列表。最多100个
+     * cursor 否 用于分页查询的游标，字符串类型，由上一次调用返回，首次调用不填
      * limit 是 分页，预期请求的数据量，取值范围 1 ~ 1000
+     * 如果不指定 owner_filter，会拉取应用可见范围内的所有群主的数据，但是不建议这样使用。如果可见范围内人数超过1000人，为了防止数据包过大，会报错 81017。此时，调用方需通过指定 owner_filter 来缩小拉取范围
+     * 旧版接口以offset+limit分页，要求offset+limit不能超过50000，该方案将废弃，请改用cursor+limit分页
      * 权限说明:
      *
      * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-     * 暂不支持第三方调用。
+     * 第三方应用需具有“企业客户权限->客户基础信息”权限
+     * 对于第三方/自建应用，群主必须在应用的可见范围。
+     *
+     *
      * 返回结果：
      *
      * {
@@ -70,7 +84,8 @@ class GroupChat
      * }, {
      * "chat_id": "wrOgQhDgAAcwMTB7YmDkbeBsAAAA",
      * "status": 0
-     * }]
+     * }],
+     * "next_cursor":"tJzlB9tdqfh-g7i_J-ehOz_TWcd7dSKa39_AqCIeMFw"
      * }
      * 参数说明：
      *
@@ -78,21 +93,22 @@ class GroupChat
      * errcode 返回码
      * errmsg 对返回码的文本描述内容
      * group_chat_list 客户群列表
-     * chat_id 客户群ID
-     * status 客户群状态。
-     * 0 - 正常
+     * group_chat_list.chat_id 客户群ID
+     * group_chat_list.status 客户群跟进状态。
+     * 0 - 跟进人正常
      * 1 - 跟进人离职
      * 2 - 离职继承中
      * 3 - 离职继承完成
+     * next_cursor 分页游标，下次请求时填写以获取之后分页的记录。如果该字段返回空则表示已没有更多数据
      */
-    public function getGroupchatList($status_filter = 0, $owner_filter = array(), $offset = 0, $limit = 1000)
+    public function getGroupchatList($status_filter = 0, $owner_filter = array(), $cursor = "", $limit = 1000)
     {
         $params = array();
         $params['status_filter'] = $status_filter;
         if (!empty($owner_filter)) {
             $params['owner_filter'] = $owner_filter;
         }
-        $params['offset'] = $offset;
+        $params['cursor'] = $cursor;
         $params['limit'] = $limit;
         $rst = $this->_request->post($this->_url . 'list', $params);
         return $this->_client->rst($rst);
@@ -100,8 +116,9 @@ class GroupChat
 
     /**
      * 获取客户群详情
-     * 调试工具
      * 通过客户群ID，获取详情。包括群名、群成员列表、群成员入群时间、入群方式。（客户群是由具有客户群使用权限的成员创建的外部群）
+     *
+     * 需注意的是，如果发生群信息变动，会立即收到群变更事件，但是部分信息是异步处理，可能需要等一段时间调此接口才能得到最新结果
      *
      * 请求方式：POST（HTTPS）
      * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/groupchat/get?access_token=ACCESS_TOKEN
@@ -109,15 +126,22 @@ class GroupChat
      * 参数说明：
      *
      * {
-     * "chat_id":"wrOgQhDgAAMYQiS5ol9G7gK9JVAAAA"
+     * "chat_id":"wrOgQhDgAAMYQiS5ol9G7gK9JVAAAA",
+     * "need_name" : 1
      * }
      * 参数 必须 说明
      * access_token 是 调用接口凭证
      * chat_id 是 客户群ID
+     * need_name 否 是否需要返回群成员的名字group_chat.member_list.name。0-不返回；1-返回。默认不返回
+     *
+     *
      * 权限说明:
      *
-     * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-     * 暂不支持第三方调用。
+     * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
+     * 第三方应用需具有“企业客户权限->客户基础信息”权限
+     * 对于第三方/自建应用，群主必须在应用的可见范围。
+     *
+     *
      * 返回结果：
      *
      * {
@@ -128,22 +152,30 @@ class GroupChat
      * "name": "销售客服群",
      * "owner": "ZhuShengBen",
      * "create_time": 1572505490,
-     * "notice" : "文明沟通，拒绝脏话",
+     * "notice": "文明沟通，拒绝脏话",
      * "member_list": [{
      * "userid": "abel",
      * "type": 1,
      * "join_time": 1572505491,
-     * "join_scene": 1
-     * }, {
-     * "userid": "sam",
-     * "type": 1,
-     * "join_time": 1572505491,
-     * "join_scene": 1
+     * "join_scene": 1,
+     * "invitor": {
+     * "userid": "jack"
+     * },
+     * "group_nickname" : "客服小张",
+     * "name" : "张三丰"
      * }, {
      * "userid": "wmOgQhDgAAuXFJGwbve4g4iXknfOAAAA",
      * "type": 2,
+     * "unionid": "ozynqsulJFCZ2z1aYeS8h-nuasdAAA",
      * "join_time": 1572505491,
-     * "join_scene": 1
+     * "join_scene": 1,
+     * "group_nickname" : "顾客老王",
+     * "name" : "王语嫣"
+     * }],
+     * "admin_list": [{
+     * "userid": "sam"
+     * }, {
+     * "userid": "pony"
      * }]
      * }
      * }
@@ -153,27 +185,82 @@ class GroupChat
      * errcode 返回码
      * errmsg 对返回码的文本描述内容
      * group_chat 客户群详情
-     * chat_id 客户群ID
-     * name 群名
-     * owner 群主ID
-     * create_time 群的创建时间
-     * notice 群公告
-     * member_list 群成员列表
-     * userid 群成员id
-     * type 成员类型。
+     * group_chat.chat_id 客户群ID
+     * group_chat.name 群名
+     * group_chat.owner 群主ID
+     * group_chat.create_time 群的创建时间
+     * group_chat.notice 群公告
+     * group_chat.member_list 群成员列表
+     * group_chat.member_list.userid 群成员id
+     * group_chat.member_list.type 成员类型。
      * 1 - 企业成员
      * 2 - 外部联系人
-     * join_time 入群时间
-     * join_scene 入群方式。
-     * 1 - 由成员邀请入群（直接邀请入群）
-     * 2 - 由成员邀请入群（通过邀请链接入群）
+     * group_chat.member_list.unionid 外部联系人在微信开放平台的唯一身份标识（微信unionid），通过此字段企业可将外部联系人与公众号/小程序用户关联起来。仅当群成员类型是微信用户（包括企业成员未添加好友），且企业绑定了微信开发者ID有此字段（查看绑定方法）。第三方不可获取，上游企业不可获取下游企业客户的unionid字段
+     * group_chat.member_list.join_time 入群时间
+     * group_chat.member_list.join_scene 入群方式。
+     * 1 - 由群成员邀请入群（直接邀请入群）
+     * 2 - 由群成员邀请入群（通过邀请链接入群）
      * 3 - 通过扫描群二维码入群
+     * group_chat.member_list.invitor 邀请者。目前仅当是由本企业内部成员邀请入群时会返回该值
+     * group_chat.member_list.invitor.userid 邀请者的userid
+     * group_chat.member_list.group_nickname 在群里的昵称
+     * group_chat.member_list.name 名字。仅当 need_name = 1 时返回
+     * 如果是微信用户，则返回其在微信中设置的名字
+     * 如果是企业微信联系人，则返回其设置对外展示的别名或实名
+     * group_chat.admin_list 群管理员列表
+     * group_chat.admin_list.userid 群管理员userid
      */
-    public function get($chat_id)
+    public function get($chat_id, $need_name = 0)
     {
         $params = array();
         $params['chat_id'] = $chat_id;
+        $params['need_name'] = $need_name;
         $rst = $this->_request->post($this->_url . 'get', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 客户群opengid转换
+     * 用户在微信里的客户群里打开小程序时，某些场景下可以获取到群的opengid，如果该群是企业微信的客户群，则企业或第三方可以调用此接口将一个opengid转换为客户群chat_id
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/opengid_to_chatid?access_token=ACCESS_TOKEN
+     *
+     * 请求参数：
+     *
+     * {
+     * "opengid":"oAAAAAAA"
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * access_token 是 调用接口凭证
+     * opengid 是 小程序在微信获取到的群ID，参见wx.getGroupEnterInfo
+     * 权限说明：
+     *
+     * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
+     * 第三方应用需具有“企业客户权限->客户基础信息”权限
+     * 对于第三方/自建应用，群主必须在应用的可见范围
+     * 仅支持企业服务人员创建的客户群
+     * 仅可转换出自己企业下的客户群chat_id
+     * 返回结果：
+     *
+     * ｛
+     * "errcode":0,
+     * "errmsg":"ok",
+     * "chat_id":"ooAAAAAAAAAAA"
+     * ｝
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * chat_id 客户群ID，可以用来调用获取客户群详情
+     */
+    public function opengidToChatid($opengid = 0)
+    {
+        $params = array();
+        $params['opengid'] = $opengid;
+        $rst = $this->_request->post($this->_url . 'opengid_to_chatid', $params);
         return $this->_client->rst($rst);
     }
 
