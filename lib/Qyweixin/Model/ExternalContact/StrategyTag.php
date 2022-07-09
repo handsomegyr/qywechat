@@ -3,11 +3,14 @@
 namespace Qyweixin\Model\ExternalContact;
 
 /**
- * 企业客户标签
+ * 为指定规则组创建企业客户标签
  */
-class CorpTag extends \Qyweixin\Model\Base
+class StrategyTag extends \Qyweixin\Model\Base
 {
-
+    /**
+     * strategy_id	是	规则组id
+     */
+    public $strategy_id = NULL;
     /**
      * group_id 否 标签组id
      */
@@ -31,20 +34,23 @@ class CorpTag extends \Qyweixin\Model\Base
      */
     public $tag = NULL;
 
-    /**
-     * agentid	否	授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
-     */
-    public $agentid = NULL;
+    // /**
+    //  * agentid	否	授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
+    //  */
+    // public $agentid = NULL;
 
-    public function __construct(array $tag)
+    public function __construct($strategy_id, array $tag)
     {
+        $this->strategy_id = $strategy_id;
         $this->tag = $tag;
     }
 
     public function getParams()
     {
         $params = array();
-
+        if ($this->isNotNull($this->strategy_id)) {
+            $params['strategy_id'] = $this->strategy_id;
+        }
         if ($this->isNotNull($this->group_id)) {
             $params['group_id'] = $this->group_id;
         }
@@ -57,9 +63,9 @@ class CorpTag extends \Qyweixin\Model\Base
         if ($this->isNotNull($this->tag)) {
             $params['tag'] = $this->tag;
         }
-        if ($this->isNotNull($this->agentid)) {
-            $params['agentid'] = $this->agentid;
-        }
+        // if ($this->isNotNull($this->agentid)) {
+        //     $params['agentid'] = $this->agentid;
+        // }
         return $params;
     }
 }

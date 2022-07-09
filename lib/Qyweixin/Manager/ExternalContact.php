@@ -3,10 +3,13 @@
 namespace Qyweixin\Manager;
 
 use Qyweixin\Client;
-use Qyweixin\Manager\ExternalContact\GroupChat;
-use Qyweixin\Manager\ExternalContact\GroupMsg;
-use Qyweixin\Manager\ExternalContact\GroupWelcomeTemplate;
 use Qyweixin\Manager\ExternalContact\Moment;
+use Qyweixin\Manager\ExternalContact\GroupMsg;
+use Qyweixin\Manager\ExternalContact\GroupChat;
+use Qyweixin\Manager\ExternalContact\ContactWay;
+use Qyweixin\Manager\ExternalContact\StrategyTag;
+use Qyweixin\Manager\ExternalContact\CustomerStrategy;
+use Qyweixin\Manager\ExternalContact\GroupWelcomeTemplate;
 
 /**
  * 外部企业的联系人管理
@@ -67,6 +70,35 @@ class ExternalContact
 	}
 
 	/**
+	 * 获取客户联系规则组管理对象
+	 *
+	 * @return \Qyweixin\Manager\ExternalContact\CustomerStrategy
+	 */
+	public function getCustomerStrategyManager()
+	{
+		return new CustomerStrategy($this->_client);
+	}
+
+	/**
+	 * 获取管理企业规则组下的客户标签对象
+	 *
+	 * @return \Qyweixin\Manager\ExternalContact\StrategyTag
+	 */
+	public function getStrategyTagManager()
+	{
+		return new StrategyTag($this->_client);
+	}
+
+	/**
+	 * 获取客户联系「联系我」管理对象
+	 *
+	 * @return \Qyweixin\Manager\ExternalContact\ContactWay
+	 */
+	public function getContactWayManager()
+	{
+		return new ContactWay($this->_client);
+	}
+	/**
 	 * 获取配置了客户联系功能的成员列表
 	 * 调试工具
 	 * 企业和第三方服务商可通过此接口获取配置了客户联系功能的成员列表。
@@ -109,312 +141,34 @@ class ExternalContact
 
 	/**
 	 * 配置客户联系「联系我」方式
-	 * 企业可以在管理后台-客户联系中配置成员的「联系我」的二维码或者小程序按钮，客户通过扫描二维码或点击小程序上的按钮，即可获取成员联系方式，主动联系到成员。
-	 * 企业可通过此接口为具有客户联系功能的成员生成专属的「联系我」二维码或者「联系我」按钮。
-	 * 如果配置的是「联系我」按钮，需要开发者的小程序接入小程序插件。
-	 *
-	 * 注意:
-	 * 通过API添加的「联系我」不会在管理端进行展示，每个企业可通过API最多配置50万个「联系我」。
-	 * 用户需要妥善存储返回的config_id，config_id丢失可能导致用户无法编辑或删除「联系我」。
-	 * 临时会话模式不占用「联系我」数量，但每日最多添加10万个，并且仅支持单人。
-	 * 临时会话模式的二维码，添加好友完成后该二维码即刻失效。
-	 *
-	 * 请求方式：POST（HTTPS）
-	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_contact_way?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例：
-	 *
-	 * {
-	 * "type" :1,
-	 * "scene":1,
-	 * "style":1,
-	 * "remark":"渠道客户",
-	 * "skip_verify":true,
-	 * "state":"teststate",
-	 * "user" : ["UserID1", "UserID2", "UserID3"],
-	 * "party" : [PartyID1, PartyID2],
-	 * "is_temp":true,
-	 * "expires_in":86400,
-	 * "chat_expires_in":86400,
-	 * "unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
-	 * "conclusions":
-	 * {
-	 * "text":
-	 * {
-	 * "content":"文本消息内容"
-	 * },
-	 * "image":
-	 * {
-	 * "media_id": "MEDIA_ID"
-	 * },
-	 * "link":
-	 * {
-	 * "title": "消息标题",
-	 * "picurl": "https://example.pic.com/path",
-	 * "desc": "消息描述",
-	 * "url": "https://example.link.com/path"
-	 * },
-	 * "miniprogram":
-	 * {
-	 * "title": "消息标题",
-	 * "pic_media_id": "MEDIA_ID",
-	 * "appid": "wx8bd80126147dfAAA",
-	 * "page": "/path/index"
-	 * }
-	 * }
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * type 是 联系方式类型,1-单人, 2-多人
-	 * scene 是 场景，1-在小程序中联系，2-通过二维码联系
-	 * style 否 在小程序中联系时使用的控件样式，详见附表
-	 * remark 否 联系方式的备注信息，用于助记，不超过30个字符
-	 * skip_verify 否 外部客户添加时是否无需验证，默认为true
-	 * state 否 企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值，不超过30个字符
-	 * user 否 使用该联系方式的用户userID列表，在type为1时为必填，且只能有一个
-	 * party 否 使用该联系方式的部门id列表，只在type为2时有效
-	 * is_temp 否 是否临时会话模式，true表示使用临时会话模式，默认为false
-	 * expires_in 否 临时会话二维码有效期，以秒为单位。该参数仅在is_temp为true时有效，默认7天
-	 * chat_expires_in 否 临时会话有效期，以秒为单位。该参数仅在is_temp为true时有效，默认为添加好友后24小时
-	 * unionid 否 可进行临时会话的客户unionid，该参数仅在is_temp为true时有效，如不指定则不进行限制
-	 * conclusions 否 结束语，会话结束时自动发送给客户，可参考“结束语定义”，仅在is_temp为true时有效
-	 * 注意，每个联系方式最多配置100个使用成员（包含部门展开后的成员）
-	 * 当设置为临时会话模式时（即is_temp为true），联系人仅支持配置为单人，暂不支持多人
-	 * 使用unionid需要调用方（企业或服务商）的企业微信“客户联系”中已绑定微信开发者账户
-	 *
-	 * 返回结果：
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok",
-	 * "config_id":"42b34949e138eb6e027c123cba77fAAA"　　
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
-	 * config_id 新增联系方式的配置id
 	 */
 	public function addContactWay(\Qyweixin\Model\ExternalContact\ContactWay $contactWay)
 	{
-		$params = $contactWay->getParams();
-		$rst = $this->_request->post($this->_url . 'add_contact_way', $params);
-		return $this->_client->rst($rst);
+		return $this->getContactWayManager()->add($contactWay);
 	}
 
 	/**
 	 * 获取企业已配置的「联系我」方式
-	 * 批量获取企业配置的「联系我」二维码和「联系我」小程序按钮。
-	 * 请求方式：POST（HTTPS）
-	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_contact_way?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例：
-	 *
-	 * {
-	 * "config_id":"42b34949e138eb6e027c123cba77fad7"
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * config_id 是 联系方式的配置id
-	 * 返回结果：
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok",
-	 * "contact_way":
-	 * {
-	 * "config_id":"42b34949e138eb6e027c123cba77fAAA",
-	 * "type":1,
-	 * "scene":1,
-	 * "style":2,
-	 * "remark":"test remark",
-	 * "skip_verify":true,
-	 * "state":"teststate",
-	 * "qr_code":"http://p.qpic.cn/wwhead/duc2TvpEgSdicZ9RrdUtBkv2UiaA/0",
-	 * "user" : ["UserID1", "UserID2", "UserID3"],
-	 * "party" : [PartyID1, PartyID2]，
-	 * "is_temp":true,
-	 * "expires_in":86400,
-	 * "chat_expires_in":86400,
-	 * "unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
-	 * "conclusions":
-	 * {
-	 * "text":
-	 * {
-	 * "content":"文本消息内容"
-	 * },
-	 * "image":
-	 * {
-	 * "pic_url": "http://p.qpic.cn/pic_wework/XXXXX"
-	 * },
-	 * "link":
-	 * {
-	 * "title": "消息标题",
-	 * "picurl": "https://example.pic.com/path",
-	 * "desc": "消息描述",
-	 * "url": "https://example.link.com/path"
-	 * },
-	 * "miniprogram":
-	 * {
-	 * "title": "消息标题",
-	 * "pic_media_id": "MEDIA_ID",
-	 * "appid": "wx8bd80126147dfAAA",
-	 * "page": "/path/index"
-	 * }
-	 * }
-	 * }
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
-	 * config_id 新增联系方式的配置id
-	 * type 联系方式类型，1-单人，2-多人
-	 * scene 场景，1-在小程序中联系，2-通过二维码联系
-	 * is_temp 是否临时会话模式，默认为false，true表示使用临时会话模式
-	 * remark 联系方式的备注信息，用于助记
-	 * skip_verify 外部客户添加时是否无需验证
-	 * state 企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值
-	 * style 小程序中联系按钮的样式，仅在scene为1时返回，详见附录
-	 * qr_code 联系二维码的URL，仅在scene为2时返回
-	 * user 使用该联系方式的用户userID列表
-	 * party 使用该联系方式的部门id列表
-	 * expires_in 临时会话二维码有效期，以秒为单位
-	 * chat_expires_in 临时会话有效期，以秒为单位
-	 * unionid 可进行临时会话的客户unionid
-	 * conclusions 结束语，可参考“结束语定义”
 	 */
 	public function getContactWay($config_id)
 	{
-		$params = array();
-		$params['config_id'] = $config_id;
-		$rst = $this->_request->post($this->_url . 'get_contact_way', $params);
-		return $this->_client->rst($rst);
+		return $this->getContactWayManager()->get($config_id);
 	}
 
 	/**
 	 * 更新企业已配置的「联系我」方式
-	 * 更新企业配置的「联系我」二维码和「联系我」小程序按钮中的信息，如使用人员和备注等。
-	 *
-	 * 请求方式：POST（HTTPS）
-	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/update_contact_way?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例：
-	 *
-	 * {
-	 * "config_id":"42b34949e138eb6e027c123cba77fAAA",
-	 * "remark":"渠道客户",
-	 * "skip_verify":true,
-	 * "style":1,
-	 * "state":"teststate",
-	 * "user" : ["UserID1", "UserID2", "UserID3"],
-	 * "party" : [PartyID1, PartyID2],
-	 * "expires_in":86400,
-	 * "chat_expires_in":86400，
-	 * "unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
-	 * "conclusions":
-	 * {
-	 * "text":
-	 * {
-	 * "content":"文本消息内容"
-	 * },
-	 * "image":
-	 * {
-	 * "media_id": "MEDIA_ID"
-	 * },
-	 * "link":
-	 * {
-	 * "title": "消息标题",
-	 * "picurl": "https://example.pic.com/path",
-	 * "desc": "消息描述",
-	 * "url": "https://example.link.com/path"
-	 * },
-	 * "miniprogram":
-	 * {
-	 * "title": "消息标题",
-	 * "pic_media_id": "MEDIA_ID",
-	 * "appid": "wx8bd80126147dfAAA",
-	 * "page": "/path/index"
-	 * }
-	 * }
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * config_id 是 企业联系方式的配置id
-	 * remark 否 联系方式的备注信息，不超过30个字符，将覆盖之前的备注
-	 * skip_verify 否 外部客户添加时是否无需验证
-	 * style 否 样式，只针对“在小程序中联系”的配置生效
-	 * state 否 企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值
-	 * user 否 使用该联系方式的用户列表，将覆盖原有用户列表
-	 * party 否 使用该联系方式的部门列表，将覆盖原有部门列表，只在配置的type为2时有效
-	 * expires_in 否 临时会话二维码有效期，以秒为单位，该参数仅在临时会话模式下有效
-	 * chat_expires_in 否 临时会话有效期，以秒为单位，该参数仅在临时会话模式下有效
-	 * unionid 否 可进行临时会话的客户unionid，该参数仅在临时会话模式有效，如不指定则不进行限制
-	 * conclusions 否 结束语，会话结束时自动发送给客户，可参考“结束语定义”，仅临时会话模式（is_temp为true）可设置
-	 * 注意：已失效的临时会话联系方式无法进行编辑
-	 * 当临时会话模式时（即is_temp为true），联系人仅支持配置为单人，暂不支持多人
-	 *
-	 * 返回结果：
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok"
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
 	 */
 	public function updateContactWay(\Qyweixin\Model\ExternalContact\ContactWay $contactWay)
 	{
-		$params = $contactWay->getParams();
-		$rst = $this->_request->post($this->_url . 'update_contact_way', $params);
-		return $this->_client->rst($rst);
+		return $this->getContactWayManager()->update($contactWay);
 	}
 
 	/**
 	 * 删除企业已配置的「联系我」方式
-	 * 删除一个已配置的「联系我」二维码或者「联系我」小程序按钮。
-	 * 请求方式：POST（HTTPS）
-	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/del_contact_way?access_token=ACCESS_TOKEN
-	 *
-	 * 请求示例：
-	 *
-	 * {
-	 * "config_id":"42b34949e138eb6e027c123cba77fAAA"
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 必须 说明
-	 * access_token 是 调用接口凭证
-	 * config_id 是 企业联系方式的配置id
-	 * 返回结果：
-	 *
-	 * {
-	 * "errcode": 0,
-	 * "errmsg": "ok",
-	 * }
-	 * 参数说明：
-	 *
-	 * 参数 说明
-	 * errcode 返回码
-	 * errmsg 对返回码的文本描述内容
 	 */
-	public function delelteContactWay($config_id)
+	public function deleteContactWay($config_id)
 	{
-		$params = array();
-		$params['config_id'] = $config_id;
-		$rst = $this->_request->post($this->_url . 'del_contact_way', $params);
-		return $this->_client->rst($rst);
+		return $this->getContactWayManager()->del($config_id);
 	}
 
 	/**
@@ -565,6 +319,7 @@ class ExternalContact
 	 * 参数 必须 说明
 	 * access_token 是 调用接口凭证
 	 * external_userid 是 外部联系人的userid，注意不是企业成员的帐号
+	 * cursor	否	上次请求返回的next_cursor
 	 * 权限说明：
 	 *
 	 * 企业需要使用系统应用“客户联系”或配置到“可调用应用”列表中的自建应用的secret所获取的accesstoken来调用（accesstoken如何获取？）；
@@ -641,7 +396,8 @@ class ExternalContact
 	 * "createtime":1525881637,
 	 * "state":"外联二维码1"
 	 * }
-	 * ]
+	 * ],
+	 * "next_cursor":"NEXT_CURSOR"
 	 * }
 	 * 参数说明：
 	 *
@@ -669,12 +425,14 @@ class ExternalContact
 	 * follow_user.remark_mobiles 该成员对此客户备注的手机号码，第三方不可获取
 	 * follow_user.state 该成员添加此客户的渠道，由用户通过创建「联系我」方式指定
 	 * 如果外部联系人为微信用户，则返回外部联系人的名称为其微信昵称；如果外部联系人为企业微信用户，则会按照以下优先级顺序返回：此外部联系人或管理员设置的昵称、认证的实名和账号名称。
-	 * 关于返回的unionid，如果是第三方应用调用该接口，则返回的unionid是该第三方服务商所关联的微信开放者帐号下的unionid。也就是说，同一个企业客户，企业自己调用，与第三方服务商调用，所返回的unionid不同；不同的服务商调用，所返回的unionid也不同。
+	 * 关于返回unionid，如果是第三方应用调用该接口，则返回的unionid是该第三方服务商所关联的微信开放者帐号下的unionid。也就是说，同一个企业客户，企业自己调用，与第三方服务商调用，所返回的unionid不同；不同的服务商调用，所返回的unionid也不同。
+	 * next_cursor	分页的cursor，当跟进人多于500人时返回
 	 */
-	public function get($external_userid)
+	public function get($external_userid, $cursor = "")
 	{
 		$params = array();
 		$params['external_userid'] = $external_userid;
+		$params['cursor'] = $cursor;
 		$rst = $this->_request->get($this->_url . 'get', $params);
 		return $this->_client->rst($rst);
 	}
@@ -746,6 +504,8 @@ class ExternalContact
 	 * 获取企业标签库
 	 * 企业可通过此接口获取企业客户标签详情。
 	 *
+	 *
+	 *
 	 * 请求方式: POST(HTTP)
 	 *
 	 * 请求地址:https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_corp_tag_list?access_token=ACCESS_TOKEN
@@ -753,16 +513,27 @@ class ExternalContact
 	 * 请求示例:
 	 *
 	 * {
-	 * "tag_id": [
+	 * "tag_id":
+	 * [
 	 * "etXXXXXXXXXX",
 	 * "etYYYYYYYYYY"
+	 * ],
+	 * "group_id":
+	 * [
+	 * "etZZZZZZZZZZZZZ",
+	 * "etYYYYYYYYYYYYY"
 	 * ]
 	 * }
+	 *
+	 *
 	 * 参数说明:
 	 *
 	 * 参数 必须 说明
 	 * access_token 是 调用接口凭证
-	 * tag_id 否 要查询的标签id，如果不填则获取该企业的所有客户标签，目前暂不支持标签组id
+	 * tag_id 否 要查询的标签id
+	 * group_id 否 要查询的标签组id，返回该标签组以及其下的所有标签信息
+	 * 若tag_id和group_id均为空，则返回所有标签。
+	 * 同时传递tag_id和group_id时，忽略tag_id，仅以group_id作为过滤条件。
 	 * 返回结果:
 	 *
 	 * {
@@ -778,14 +549,14 @@ class ExternalContact
 	 * "id": "TAG_ID1",
 	 * "name": "NAME1",
 	 * "create_time": 1557838797,
-	 * "order": "1",
+	 * "order": 1,
 	 * "deleted": false
 	 * },
 	 * {
 	 * "id": "TAG_ID2",
 	 * "name": "NAME2",
 	 * "create_time": 1557838797,
-	 * "order": "2",
+	 * "order": 2,
 	 * "deleted": true
 	 * }
 	 * ]
@@ -807,12 +578,17 @@ class ExternalContact
 	 * tag_group.tag.name 标签名称
 	 * tag_group.tag.create_time 标签创建时间
 	 * tag_group.tag.order 标签排序的次序值，order值大的排序靠前。有效的值范围是[0, 2^32)
-	 * tag_group.tag.deleted 标签是否已经被删除，只在指定tag_id进行查询时返回
+	 * tag_group.tag.deleted 标签是否已经被删除，只在指定tag_id/group_id进行查询时返回
 	 */
-	public function getCorpTagList(array $tag_id)
+	public function getCorpTagList(array $tag_id = array(), array $group_id = array())
 	{
 		$params = array();
-		$params['tag_id'] = $tag_id;
+		if (!empty($tag_id)) {
+			$params['tag_id'] = $tag_id;
+		}
+		if (!empty($group_id)) {
+			$params['group_id'] = $group_id;
+		}
 		$rst = $this->_request->post($this->_url . 'get_corp_tag_list', $params);
 		return $this->_client->rst($rst);
 	}
@@ -840,7 +616,8 @@ class ExternalContact
 	 * "name": "TAG_NAME_2",
 	 * "order": 2
 	 * }
-	 * ]
+	 * ],
+	 * "agentid" : 1000014
 	 * }
 	 * 参数说明:
 	 *
@@ -856,6 +633,7 @@ class ExternalContact
 	 * 如果填写了group_id参数，则group_name和标签组的order参数会被忽略。
 	 * 不支持创建空标签组。
 	 * 标签组内的标签不可同名，如果传入多个同名标签，则只会创建一个。
+	 * agentid 否 授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
 	 *
 	 * 返回结果:
 	 *
@@ -919,6 +697,7 @@ class ExternalContact
 	 * "id": "TAG_ID",
 	 * "name": "NEW_TAG_NAME",
 	 * "order": 1
+	 * "agentid" : 1000014
 	 * }
 	 * 参数说明:
 	 *
@@ -926,8 +705,8 @@ class ExternalContact
 	 * access_token 是 调用接口凭证
 	 * id 是 标签或标签组的id列表
 	 * name 否 新的标签或标签组名称，最长为30个字符
-	 * order 否 标签/标签组的次序值。order值大的排序靠前。有效的值范围是[0, 2^32)
-	 * 注意:修改后的标签组不能和已有的标签组重名，标签也不能和同一标签组下的其他标签重名。
+	 * order 否 标签/标签组的次序值。order值大的排序靠前。有效的值范围是[0, 2^32)注意:修改后的标签组不能和已有的标签组重名，标签也不能和同一标签组下的其他标签重名。
+	 * agentid 否 授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
 	 *
 	 * 返回结果:
 	 *
@@ -967,7 +746,8 @@ class ExternalContact
 	 * "group_id": [
 	 * "GROUP_ID_1",
 	 * "GROUP_ID_2"
-	 * ]
+	 * ],
+	 * "agentid" : 1000014
 	 * }
 	 * 参数说明:
 	 *
@@ -975,8 +755,8 @@ class ExternalContact
 	 * access_token 是 调用接口凭证
 	 * tag_id 否 标签的id列表
 	 * group_id 否 标签组的id列表
-	 * tag_id和group_id不可同时为空。
-	 * 如果一个标签组下所有的标签均被删除，则标签组会被自动删除。
+	 * tag_id和group_id不可同时为空。* 如果一个标签组下所有的标签均被删除，则标签组会被自动删除。
+	 * agentid 否 授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
 	 *
 	 * 返回结果:
 	 *
@@ -990,7 +770,7 @@ class ExternalContact
 	 * errcode 返回码
 	 * errmsg 对返回码的文本描述内容
 	 */
-	public function deleteCorpTag($tag_id, $group_id)
+	public function deleteCorpTag($tag_id, $group_id, $agentid = "")
 	{
 		$params = array();
 		if (empty($tag_id) && empty($group_id)) {
@@ -1001,6 +781,9 @@ class ExternalContact
 		}
 		if (!empty($group_id)) {
 			$params['group_id'] = $group_id;
+		}
+		if (!empty($agentid)) {
+			$params['agentid'] = $agentid;
 		}
 		$rst = $this->_request->post($this->_url . 'del_corp_tag', $params);
 		return $this->_client->rst($rst);
@@ -1957,6 +1740,245 @@ class ExternalContact
 		$params['cursor'] = $cursor;
 
 		$rst = $this->_request->post($this->_url . 'transfer_result', $params);
+		return $this->_client->rst($rst);
+	}
+
+	/**
+	 * 查询客户接替状态
+	 * 企业和第三方可通过此接口查询离职成员的客户分配情况。
+	 *
+	 * 请求方式：POST（HTTPS）
+	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/resigned/transfer_result?access_token=ACCESS_TOKEN
+	 *
+	 * 请求示例：
+	 *
+	 * {
+	 * "handover_userid": "zhangsan",
+	 * "takeover_userid": "lisi",
+	 * "cursor":"CURSOR"
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 必须 说明
+	 * access_token 是 调用接口凭证
+	 * handover_userid 是 原添加成员的userid
+	 * takeover_userid 是 接替成员的userid
+	 * cursor 否 分页查询的cursor，每个分页返回的数据不会超过1000条；不填或为空表示获取第一个分页
+	 * 权限说明：
+	 *
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+	 * 第三方应用需拥有“企业客户权限->客户联系->在职继承”权限
+	 * 接替成员必须在此第三方应用或自建应用的可见范围内。
+	 *
+	 *
+	 * 返回结果：
+	 *
+	 * {
+	 * "errcode": 0,
+	 * "errmsg": "ok",
+	 * "customer":
+	 * [
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACCCC",
+	 * "status":1,
+	 * "takeover_time":1588262400
+	 * },
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACBBBB",
+	 * "status":2,
+	 * "takeover_time":1588482400
+	 * },
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACAAAA",
+	 * "status":3,
+	 * "takeover_time":0
+	 * }
+	 * ],
+	 * "next_cursor":"NEXT_CURSOR"
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * customer.external_userid 转接客户的外部联系人userid
+	 * customer.status 接替状态， 1-接替完毕 2-等待接替 3-客户拒绝 4-接替成员客户达到上限
+	 * customer.takeover_time 接替客户的时间，如果是等待接替状态，则为未来的自动接替时间
+	 * next_cursor 下个分页的起始cursor
+	 * 原接口查询客户接替结果后续将不再更新维护，请使用新接口
+	 */
+	public function resignedTransferResult($handover_userid, $takeover_userid, $cursor = '')
+	{
+		$params = array();
+		if (empty($handover_userid)) {
+			throw new \Exception('handover_userid 不可为空');
+		}
+		if (empty($takeover_userid)) {
+			throw new \Exception('takeover_userid 不可为空');
+		}
+
+		$params['handover_userid'] = $handover_userid;
+		$params['takeover_userid'] = $takeover_userid;
+		$params['cursor'] = $cursor;
+
+		$rst = $this->_request->post($this->_url . 'resigned/transfer_result', $params);
+		return $this->_client->rst($rst);
+	}
+
+	/**
+	 * 批量获取客户详情
+	 * 企业/第三方可通过此接口获取指定成员添加的客户信息列表。
+	 *
+	 * 请求方式：POST（HTTPS）
+	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/batch/get_by_user?access_token=ACCESS_TOKEN
+	 *
+	 * 请求示例：
+	 *
+	 * {
+	 * "userid_list":
+	 * [
+	 * "zhangsan",
+	 * "lisi"
+	 * ],
+	 * "cursor":"",
+	 * "limit":100
+	 * }
+	 *
+	 *
+	 * 参数说明：
+	 *
+	 * 参数 必须 说明
+	 * access_token 是 调用接口凭证
+	 * userid_list 是 企业成员的userid列表，字符串类型，最多支持100个
+	 * cursor 否 用于分页查询的游标，字符串类型，由上一次调用返回，首次调用可不填
+	 * limit 否 返回的最大记录数，整型，最大值100，默认值50，超过最大值时取最大值
+	 *
+	 *
+	 * 权限说明：
+	 *
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）；
+	 * 第三方应用需具有“企业客户权限->客户基础信息”权限
+	 * 第三方/自建应用调用此接口时，userid需要在相关应用的可见范围内。
+	 * 规则组标签仅可通过“客户联系”获取。
+	 * 返回结果：
+	 *
+	 * {
+	 * "errcode": 0,
+	 * "errmsg": "ok",
+	 * "external_contact_list":
+	 * [
+	 * {
+	 * "external_contact":
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHAAA",
+	 * "name":"李四",
+	 * "position":"Manager",
+	 * "avatar":"http://p.qlogo.cn/bizmail/IcsdgagqefergqerhewSdage/0",
+	 * "corp_name":"腾讯",
+	 * "corp_full_name":"腾讯科技有限公司",
+	 * "type":2,
+	 * "gender":1,
+	 * "unionid":"ozynqsulJFCZ2z1aYeS8h-nuasdAAA",
+	 * "external_profile":
+	 * {
+	 * "external_attr":
+	 * [
+	 * {
+	 * "type":0,
+	 * "name":"文本名称",
+	 * "text":
+	 * {
+	 * "value":"文本"
+	 * }
+	 * },
+	 * {
+	 * "type":1,
+	 * "name":"网页名称",
+	 * "web":
+	 * {
+	 * "url":"http://www.test.com",
+	 * "title":"标题"
+	 * }
+	 * },
+	 * {
+	 * "type":2,
+	 * "name":"测试app",
+	 * "miniprogram":
+	 * {
+	 * "appid": "wx8bd80126147df384",
+	 * "pagepath": "/index",
+	 * "title": "my miniprogram"
+	 * }
+	 * }
+	 * ]
+	 * }
+	 * },
+	 * "follow_info":
+	 * {
+	 * "userid":"rocky",
+	 * "remark":"李部长",
+	 * "description":"对接采购事务",
+	 * "createtime":1525779812,
+	 * "tag_id":["etAJ2GCAAAXtWyujaWJHDDGi0mACHAAA"],
+	 * "remark_corp_name":"腾讯科技",
+	 * "remark_mobiles":
+	 * [
+	 * "13800000001",
+	 * "13000000002"
+	 * ],
+	 * "oper_userid":"rocky",
+	 * "add_way":10,
+	 * "wechat_channels": {
+	 * "nickname": "视频号名称",
+	 * "source": 1
+	 * }
+	 * }
+	 * },
+	 * {
+	 * "external_contact":
+	 * {
+	 * "external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHBBB",
+	 * "name":"王五",
+	 * "position":"Engineer",
+	 * "avatar":"http://p.qlogo.cn/bizmail/IcsdgagqefergqerhewSdage/0",
+	 * "corp_name":"腾讯",
+	 * "corp_full_name":"腾讯科技有限公司",
+	 * "type":2,
+	 * "gender":1,
+	 * "unionid":"ozynqsulJFCZ2asdaf8h-nuasdAAA"
+	 * },
+	 * "follow_info":
+	 * {
+	 * "userid":"lisi",
+	 * "remark":"王助理",
+	 * "description":"采购问题咨询",
+	 * "createtime":1525881637,
+	 * "tag_id":["etAJ2GCAAAXtWyujaWJHDDGi0mACHAAA","stJHDDGi0mAGi0mACHBBByujaW"],
+	 * "state":"外联二维码1",
+	 * "oper_userid":"woAJ2GCAAAd1asdasdjO4wKmE8AabjBBB",
+	 * "add_way":3
+	 * }
+	 * }
+	 * ],
+	 * "next_cursor":"r9FqSqsI8fgNbHLHE5QoCP50UIg2cFQbfma3l2QsmwI"
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * external_contact_list.external_contact 客户的基本信息，可以参考获取客户详情
+	 * external_contact_list.follow_info 企业成员客户跟进信息，可以参考获取客户详情，但标签信息只会返回企业标签和规则组标签的tag_id，个人标签将不再返回
+	 * next_cursor 分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
+	 */
+	public function batchGetByUser(array $userid_list, $cursor = "", $limit = 100)
+	{
+		$params = array();
+		$params['userid_list'] = $userid_list;
+		$params['cursor'] = $cursor;
+		$params['limit'] = $limit;
+
+		$rst = $this->_request->post($this->_url . 'batch/get_by_user', $params);
 		return $this->_client->rst($rst);
 	}
 }
