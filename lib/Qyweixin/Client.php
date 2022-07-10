@@ -356,6 +356,16 @@ class Client
     }
 
     /**
+     * 获取导出管理器
+     *
+     * @return \Qyweixin\Manager\Export
+     */
+    public function getExportManager()
+    {
+        return new Export($this);
+    }
+
+    /**
      * 签名校验
      * 
      * @param string $token            

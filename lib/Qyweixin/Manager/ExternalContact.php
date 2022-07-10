@@ -9,6 +9,7 @@ use Qyweixin\Manager\ExternalContact\GroupMsg;
 use Qyweixin\Manager\ExternalContact\GroupChat;
 use Qyweixin\Manager\ExternalContact\ContactWay;
 use Qyweixin\Manager\ExternalContact\StrategyTag;
+use Qyweixin\Manager\ExternalContact\MomentStrategy;
 use Qyweixin\Manager\ExternalContact\CustomerStrategy;
 use Qyweixin\Manager\ExternalContact\GroupWelcomeTemplate;
 
@@ -108,6 +109,17 @@ class ExternalContact
 	{
 		return new ContactWay($this->_client);
 	}
+
+	/**
+	 * 获取客户朋友圈规则组管理对象
+	 *
+	 * @return \Qyweixin\Manager\ExternalContact\MomentStrategy
+	 */
+	public function getMomentStrategyManager()
+	{
+		return new MomentStrategy($this->_client);
+	}
+
 	/**
 	 * 获取配置了客户联系功能的成员列表
 	 * 调试工具
@@ -811,6 +823,11 @@ class ExternalContact
 	 * "video": {
 	 * "media_id": "MEDIA_ID"
 	 * }
+	 * }, {
+	 * "msgtype": "file",
+	 * "file": {
+	 * "media_id": "MEDIA_ID"
+	 * }
 	 * }]
 	 * }
 	 * 参数说明:
@@ -834,6 +851,7 @@ class ExternalContact
 	 * miniprogram.appid 是 小程序appid，必须是关联到企业的小程序应用
 	 * miniprogram.page 是 小程序page路径
 	 * video.media_id 是 视频的media_id，可以通过素材管理接口获得
+	 * file.media_id	是	文件的media_id，可以通过素材管理接口获得
 	 * text和attachments不能同时为空；
 	 * text与另外三者可以同时发送，此时将会以两条消息的形式触达客户
 	 * attachments中每个附件信息必须与msgtype一致，例如，msgtype指定为image，则需要填写image.pic_url或者image.media_id，否则会报错。
@@ -957,6 +975,12 @@ class ExternalContact
 	 * "video": {
 	 * "media_id": "MEDIA_ID"
 	 * }
+	 * },{
+	 * "msgtype":"file",
+	 * "file":
+	 * {
+	 * "media_id":"MEDIA_ID"
+	 * 	}
 	 * }]
 	 * }
 	 * 参数说明:
@@ -978,6 +1002,7 @@ class ExternalContact
 	 * miniprogram.appid 是 小程序appid，必须是关联到企业的小程序应用
 	 * miniprogram.page 是 小程序page路径
 	 * video.media_id 是 视频的media_id，可以通过素材管理接口获得
+	 * file.media_id	是	文件的media_id, 可以通过素材管理接口获得
 	 * text和attachments不能同时为空；
 	 * text与附件信息可以同时发送，此时将会以多条消息的形式触达客户
 	 * attachments中每个附件信息必须与msgtype一致，例如，msgtype指定为image，则需要填写image.pic_url或者image.media_id，否则会报错。

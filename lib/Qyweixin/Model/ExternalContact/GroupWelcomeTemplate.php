@@ -7,7 +7,10 @@ namespace Qyweixin\Model\ExternalContact;
  */
 class GroupWelcomeTemplate extends \Qyweixin\Model\Base
 {
-
+    /**
+     * template_id 是	欢迎语素材id
+     */
+    public $template_id = NULL;
     /**
      * text 消息文本
      *
@@ -35,6 +38,18 @@ class GroupWelcomeTemplate extends \Qyweixin\Model\Base
      * @var \Qyweixin\Model\ExternalContact\Conclusion\Miniprogram
      */
     public $miniprogram = NULL;
+    /**
+     * miniprogram 小程序消息
+     *
+     * @var \Qyweixin\Model\ExternalContact\Conclusion\Video
+     */
+    public $video = NULL;
+    /**
+     * miniprogram 小程序消息
+     *
+     * @var \Qyweixin\Model\ExternalContact\Conclusion\File
+     */
+    public $file = NULL;
 
     /**
      * agentid	否	授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
@@ -58,6 +73,9 @@ class GroupWelcomeTemplate extends \Qyweixin\Model\Base
     {
         $params = array();
 
+        if ($this->isNotNull($this->template_id)) {
+            $params['template_id'] = $this->template_id;
+        }
         if ($this->isNotNull($this->text)) {
             $params['text'] = $this->text->getParams();
         }
@@ -72,6 +90,14 @@ class GroupWelcomeTemplate extends \Qyweixin\Model\Base
         if ($this->isNotNull($this->miniprogram)) {
             $miniprogramParams = $this->miniprogram->getParams();
             $params['miniprogram'] = $miniprogramParams[$miniprogramParams['msgtype']];
+        }
+        if ($this->isNotNull($this->video)) {
+            $linkParams = $this->video->getParams();
+            $params['video'] = $linkParams[$linkParams['video']];
+        }
+        if ($this->isNotNull($this->file)) {
+            $linkParams = $this->file->getParams();
+            $params['file'] = $linkParams[$linkParams['msgtype']];
         }
         if ($this->isNotNull($this->agentid)) {
             $params['agentid'] = $this->agentid;

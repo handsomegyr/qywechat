@@ -70,6 +70,8 @@ class GroupWelcomeTemplate
      * miniprogram.pic_media_id 是 小程序消息封面的mediaid，封面图建议尺寸为520*416
      * miniprogram.appid 是 小程序appid，必须是关联到企业的小程序应用
      * miniprogram.page 是 小程序page路径
+     * file.media_id	是	文件id，可以通过素材管理接口获得
+     * video.media_id	是	视频媒体文件id，可以通过素材管理接口获得
      * agentid 否 授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
      * notify 否 是否通知成员将这条入群欢迎语应用到客户群中，0-不通知，1-通知， 不填则通知
      *

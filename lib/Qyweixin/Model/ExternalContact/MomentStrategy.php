@@ -5,7 +5,7 @@ namespace Qyweixin\Model\ExternalContact;
 /**
  * 规则组构体
  */
-class CustomerStrategy extends \Qyweixin\Model\Base
+class MomentStrategy extends \Qyweixin\Model\Base
 {
     /**
      * strategy_id	否	规则组id
@@ -29,7 +29,7 @@ class CustomerStrategy extends \Qyweixin\Model\Base
     /**
      * privilege 基础权限
      *
-     * @var \Qyweixin\Model\ExternalContact\CustomerStrategy\Privilege
+     * @var \Qyweixin\Model\ExternalContact\MomentStrategy\Privilege
      */
     public $privilege = NULL;
 
