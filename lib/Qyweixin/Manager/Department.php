@@ -221,4 +221,116 @@ class Department
         $rst = $this->_request->get($this->_url . 'list', $params);
         return $this->_client->rst($rst);
     }
+
+    /**
+     * 获取子部门ID列表
+请求方式：GET（HTTPS）
+请求地址：https://qyapi.weixin.qq.com/cgi-bin/department/simplelist?access_token=ACCESS_TOKEN&id=ID
+
+参数说明 ：
+
+参数	必须	说明
+access_token	是	调用接口凭证
+id	否	部门id。获取指定部门及其下的子部门（以及子部门的子部门等等，递归）。 如果不填，默认获取全量组织架构
+权限说明：
+
+应用类型	权限说明
+第三方普通应用	若企业授权了“组织架构信息”权限，可获取企业所有部门id; 若未授权“组织架构信息”权限，只能拉取token对应的应用的权限范围内的部门列表
+第三方通讯录应用	可获取企业所有部门id
+代开发自建应用	只能拉取token对应的应用的权限范围内的部门列表
+普通自建应用	只能拉取token对应的应用的权限范围内的部门列表
+通讯录同步助手	可获取企业所有部门id
+返回结果：
+
+{
+   "errcode": 0,
+   "errmsg": "ok",
+   "department_id": [
+       {
+           "id": 2,
+           "parentid": 1,
+           "order": 10
+       },
+       {
+           "id": 3,
+		   "parentid": 2,
+           "order": 40
+       }
+   ]
+}
+参数说明：
+
+参数	说明
+errcode	返回码
+errmsg	对返回码的文本描述内容
+department_id	部门列表数据。
+id	创建的部门id
+parentid	父部门id。根部门为1。
+order	在父部门中的次序值。order值大的排序靠前。值范围是[0, 2^32)。
+     */
+    public function simpleList($id = 0)
+    {
+        $params = array();
+        if (!empty($id)) {
+            $params['id'] = $id;
+        }
+        $rst = $this->_request->get($this->_url . 'simplelist', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 获取单个部门详情
+请求方式：GET（HTTPS）
+请求地址：https://qyapi.weixin.qq.com/cgi-bin/department/get?access_token=ACCESS_TOKEN&id=ID
+
+参数说明 ：
+
+参数	必须	说明
+access_token	是	调用接口凭证
+id	是	部门id。
+权限说明：
+
+应用类型	权限说明
+第三方普通应用	若企业授权了组织架构信息权限，可获取企业所有部门ID、部门负责人、父部门ID; 若未授权组织架构信息权限，只能拉取token对应的应用的可见范围内部门详情
+第三方通讯录应用	可获取企业所有部门详情，部门名字除外
+代开发自建应用	只能拉取token对应的应用的权限范围内的部门详情
+普通自建应用	只能拉取token对应的应用的权限范围内的部门详情
+通讯录同步助手	可获取企业所有部门详情
+ 
+
+返回结果：
+
+{
+   "errcode": 0,
+   "errmsg": "ok",
+   "department":
+       {
+           "id": 2,
+           "name": "广州研发中心",
+		   "name_en": "RDGZ",
+		   "department_leader":["zhangsan","lisi"],
+           "parentid": 1,
+           "order": 10
+       }
+}
+参数说明：
+
+参数	说明
+errcode	返回码
+errmsg	对返回码的文本描述内容
+department	部门详情。
+id	部门id
+name	部门名称，代开发自建应用需要管理员授权才返回；第三方不可获取，需要通过通讯录展示组件来展示部门名称
+name_en	部门英文名称，代开发自建应用需要管理员授权才返回；第三方不可获取，需要通过通讯录展示组件来展示部门名称
+department_leader	部门负责人的UserID，返回在应用可见范围内的部门负责人列表；第三方仅通讯录应用或者授权了“组织架构信息-应用可获取企业的部门组织架构信息-部门负责人”的第三方应用可获取
+parentid	父部门id。根部门为1。
+order	在父部门中的次序值。order值大的排序靠前。值范围是[0, 2^32)
+     */
+    public function get($id)
+    {
+        $params = array();
+        $params['id'] = $id;
+        $rst = $this->_request->get($this->_url . 'get', $params);
+        return $this->_client->rst($rst);
+    }
 }

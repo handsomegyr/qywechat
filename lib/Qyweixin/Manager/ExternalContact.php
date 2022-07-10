@@ -1810,4 +1810,52 @@ class ExternalContact
 		$rst = $this->_request->post($this->_url . 'transfer', $params);
 		return $this->_client->rst($rst);
 	}
+
+	/**
+	 * external_userid转换
+将代开发应用或第三方应用获取的externaluserid转换成自建应用的externaluserid。
+
+请求方式：POST（HTTPS）
+请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/from_service_external_userid?access_token=ACCESS_TOKEN
+
+请求参数：
+
+{
+  "external_userid":"aaa",
+  "source_agentid":100001
+}
+参数说明：
+
+参数	必须	说明
+access_token	是	企业自建应用或基础应用的调用接口凭证。获取方法查看“获取access_token”
+external_userid	是	服务商主体的external_userid，必须是source_agentid对应的应用所获取
+source_agentid	是	企业授权的代开发自建应用或第三方应用的agentid
+ 
+
+权限说明：
+
+需要使用自建应用或基础应用的access_token
+客户的跟进人，或者用户所在客户群的群主，需要同时在access_token和source_agentid所对应应用的可见范围内
+返回结果：
+
+{
+    "errcode":0,
+    "errmsg":"ok",
+    "external_userid":"xxx",
+}
+参数说明：
+
+参数	说明
+errcode	返回码
+errmsg	对返回码的文本描述内容
+external_userid	企业主体的external_userid
+	 */
+	public function fromServiceExternalUserid($external_userid, $source_agentid)
+	{
+		$params = array();
+		$params['external_userid'] = $external_userid;
+		$params['source_agentid'] = $source_agentid;
+		$rst = $this->_request->post($this->_url . 'from_service_external_userid', $params);
+		return $this->_client->rst($rst);
+	}
 }

@@ -30,6 +30,7 @@ use Qyweixin\Manager\Living;
 use Qyweixin\Manager\Health;
 use Qyweixin\Manager\Linkedcorp;
 use Qyweixin\Manager\Kf;
+use Qyweixin\Manager\Export;
 
 class Client
 {

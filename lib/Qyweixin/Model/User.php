@@ -26,24 +26,36 @@ class User extends \Qyweixin\Model\Base
     public $gender = NULL;
     /**email	否	邮箱。长度6~64个字节，且为有效的email格式。企业内必须唯一，mobile/email二者不能同时为空*/
     public $email = NULL;
+    /**biz_mail	否	企业邮箱。仅对开通企业邮箱的企业有效。长度6~64个字节，且为有效的企业邮箱格式。企业内必须唯一。未填写则系统会为用户生成默认企业邮箱（由系统生成的邮箱可修改一次，2022年4月25日之后创建的成员需通过企业管理后台-协作-邮件-邮箱管理-成员邮箱修改）*/
+    public $biz_mail = NULL;
     /**telephone	否	座机。32字节以内，由纯数字或’-‘号组成。*/
     public $telephone = NULL;
     /**is_leader_in_dept	否	个数必须和department一致，表示在所在的部门内是否为上级。1表示为上级，0表示非上级。在审批等应用里可以用来标识上级审批人*/
     public $is_leader_in_dept = NULL;
+    /**direct_leader	否	直属上级UserID，设置范围为企业内成员，可以设置最多5个上级*/
+    public $direct_leader = NULL;
     /**avatar_mediaid	否	成员头像的mediaid，通过素材管理接口上传图片获得的mediaid*/
     public $avatar_mediaid = NULL;
     /**enable	否	启用/禁用成员。1表示启用成员，0表示禁用成员*/
     public $enable = NULL;
-    /**extattr	否	自定义字段。自定义字段需要先在WEB管理端添加，见扩展属性添加方法，否则忽略未知属性的赋值。与对外属性一致，不过只支持type=0的文本和type=1的网页类型，详细描述查看对外属性*/
+    /**
+     * extattr	否	自定义字段。自定义字段需要先在WEB管理端添加，见扩展属性添加方法，否则忽略未知属性的赋值。与对外属性一致，不过只支持type=0的文本和type=1的网页类型，详细描述查看对外属性
+     * @var \Qyweixin\Model\ExtAttr
+    */
     public $extattr = NULL;
     /**to_invite	否	是否邀请该成员使用企业微信（将通过微信服务通知或短信或邮件下发邀请，每天自动下发一次，最多持续3个工作日），默认值为true。*/
     public $to_invite = NULL;
-    /**external_profile	否	成员对外属性，字段详情见对外属性*/
+    /**
+     * external_profile	否	成员对外属性，字段详情见对外属性
+     * @var \Qyweixin\Model\ExternalProfile
+     */
     public $external_profile = NULL;
     /**external_position	否	对外职务，如果设置了该值，则以此作为对外展示的职务，否则以position来展示。长度12个汉字内*/
     public $external_position = NULL;
     /**address	否	地址。长度最大128个字符*/
     public $address = NULL;
+    /**main_department	否	主部门*/
+    public $main_department = NULL;
 
     public function __construct($userid, $name)
     {
@@ -82,11 +94,17 @@ class User extends \Qyweixin\Model\Base
         if ($this->isNotNull($this->email)) {
             $params['email'] = $this->email;
         }
+        if ($this->isNotNull($this->biz_mail)) {
+            $params['biz_mail'] = $this->biz_mail;
+        }
         if ($this->isNotNull($this->telephone)) {
             $params['telephone'] = $this->telephone;
         }
         if ($this->isNotNull($this->is_leader_in_dept)) {
             $params['is_leader_in_dept'] = $this->is_leader_in_dept;
+        }
+        if ($this->isNotNull($this->direct_leader)) {
+            $params['direct_leader'] = $this->direct_leader;
         }
         if ($this->isNotNull($this->avatar_mediaid)) {
             $params['avatar_mediaid'] = $this->avatar_mediaid;
@@ -95,9 +113,7 @@ class User extends \Qyweixin\Model\Base
             $params['enable'] = $this->enable;
         }
         if (!empty($this->extattr)) {
-            foreach ($this->extattr as $attr) {
-                $params['extattr'][] = $attr->getParams();
-            }
+            $params['extattr'] = $this->extattr->getParams();
         }
         if ($this->isNotNull($this->to_invite)) {
             $params['to_invite'] = $this->to_invite;
@@ -110,6 +126,9 @@ class User extends \Qyweixin\Model\Base
         }
         if ($this->isNotNull($this->address)) {
             $params['address'] = $this->address;
+        }
+        if ($this->isNotNull($this->main_department)) {
+            $params['main_department'] = $this->main_department;
         }
         return $params;
     }

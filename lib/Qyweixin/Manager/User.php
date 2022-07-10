@@ -43,11 +43,14 @@ class User
      * "position": "产品经理",
      * "gender": "1",
      * "email": "zhangsan@gzdev.com",
-     * "is_leader_in_dept": [1, 0],
+     * "biz_mail":"zhangsan@qyycs2.wecom.work",
+     * "is_leader_in_dept": [1, 0],,
+     * "direct_leader":["lisi","wangwu"],
      * "enable":1,
      * "avatar_mediaid": "2-G6nrLmr5EC3MNb_-zL1dDdzkd0p7cNliYu9V5w7o8K0",
      * "telephone": "020-123456",
      * "address": "广州市海珠区新港中路",
+     * "main_department": 1,
      * "extattr": {
      * "attrs": [
      * {
@@ -71,6 +74,9 @@ class User
      * "external_position": "高级产品经理",
      * "external_profile": {
      * "external_corp_name": "企业简称",
+     * 	"wechat_channels": {
+     * 		"nickname": "视频号名称"
+     * 	},
      * "external_attr": [
      * {
      * "type": 0,
@@ -112,15 +118,18 @@ class User
      * position 否 职务信息。长度为0~128个字符
      * gender 否 性别。1表示男性，2表示女性
      * email 否 邮箱。长度6~64个字节，且为有效的email格式。企业内必须唯一，mobile/email二者不能同时为空
+     * biz_mail	否	企业邮箱。仅对开通企业邮箱的企业有效。长度6~64个字节，且为有效的企业邮箱格式。企业内必须唯一。未填写则系统会为用户生成默认企业邮箱（由系统生成的邮箱可修改一次，2022年4月25日之后创建的成员需通过企业管理后台-协作-邮件-邮箱管理-成员邮箱修改）
      * telephone 否 座机。32字节以内，由纯数字或’-‘号组成。
      * is_leader_in_dept 否 个数必须和department一致，表示在所在的部门内是否为上级。1表示为上级，0表示非上级。在审批等应用里可以用来标识上级审批人
      * avatar_mediaid 否 成员头像的mediaid，通过素材管理接口上传图片获得的mediaid
+     * direct_leader	否	直属上级UserID，设置范围为企业内成员，可以设置最多5个上级
      * enable 否 启用/禁用成员。1表示启用成员，0表示禁用成员
      * extattr 否 自定义字段。自定义字段需要先在WEB管理端添加，见扩展属性添加方法，否则忽略未知属性的赋值。与对外属性一致，不过只支持type=0的文本和type=1的网页类型，详细描述查看对外属性
      * to_invite 否 是否邀请该成员使用企业微信（将通过微信服务通知或短信或邮件下发邀请，每天自动下发一次，最多持续3个工作日），默认值为true。
      * external_profile 否 成员对外属性，字段详情见对外属性
      * external_position 否 对外职务，如果设置了该值，则以此作为对外展示的职务，否则以position来展示。长度12个汉字内
      * address 否 地址。长度最大128个字符
+     * main_department	否	主部门
      * 权限说明：
      *
      * 仅通讯录同步助手或第三方通讯录应用可调用。
@@ -288,12 +297,15 @@ class User
      * "mobile": "13800000000",
      * "gender": "1",
      * "email": "zhangsan@gzdev.com",
+     * "biz_mail":"zhangsan@qyycs2.wecom.work",
      * "is_leader_in_dept": [1],
+     * "direct_leader":["lisi","wangwu"],
      * "enable": 1,
      * "avatar_mediaid": "2-G6nrLmr5EC3MNb_-zL1dDdzkd0p7cNliYu9V5w7o8K0",
      * "telephone": "020-123456",
      * "alias": "jackzhang",
      * "address": "广州市海珠区新港中路",
+     * "main_department": 1,
      * "extattr": {
      * "attrs": [
      * {
@@ -357,14 +369,17 @@ class User
      * position 否 职务信息。长度为0~128个字符
      * gender 否 性别。1表示男性，2表示女性
      * email 否 邮箱。长度不超过64个字节，且为有效的email格式。企业内必须唯一。若是绑定了腾讯企业邮的企业微信，则需要在腾讯企业邮中修改邮箱（此情况下该参数被忽略，但不会报错）
+     * biz_mail	否	邮箱。企业邮箱。仅对开通企业邮箱的企业有效。长度6~64个字节，且为有效的企业邮箱格式。企业内必须唯一。仅2022年4月25日以前创建且企业邮箱为系统自动生成的成员可修改一次
      * telephone 否 座机。由1-32位的纯数字或’-‘号组成
      * is_leader_in_dept 否 上级字段，个数必须和department一致，表示在所在的部门内是否为上级。
+     * direct_leader	否	直属上级，可以设置企业范围内成员为直属上级，最多设置5个
      * avatar_mediaid 否 成员头像的mediaid，通过素材管理接口上传图片获得的mediaid
      * enable 否 启用/禁用成员。1表示启用成员，0表示禁用成员
      * extattr 否 自定义字段。自定义字段需要先在WEB管理端添加，见扩展属性添加方法，否则忽略未知属性的赋值。与对外属性一致，不过只支持type=0的文本和type=1的网页类型，详细描述查看对外属性
      * external_profile 否 成员对外属性，字段详情见对外属性
      * external_position 否 对外职务，如果设置了该值，则以此作为对外展示的职务，否则以position来展示。不超过12个汉字
      * address 否 地址。长度最大128个字符
+     * main_department	否	主部门
      * 特别地，如果userid由系统自动生成，则仅允许修改一次。新值可由new_userid字段指定。
      *
      * 权限说明：
@@ -999,6 +1014,57 @@ class User
         $params = array();
         $params['mobile'] = $mobile;
         $rst = $this->_request->post($this->_url . 'getuserid', $params);
+        return $this->_client->rst($rst);
+    }
+
+    /**
+     * 邮箱获取userid（临时）
+通过邮箱获取其所对应的userid。
+
+请求方式：POST（HTTPS）
+请求地址：https://qyapi.weixin.qq.com/cgi-bin/user/get_userid_by_email?access_token=ACCESS_TOKEN
+
+请求包体：
+
+{
+    "email":"12345@qq.com",
+    "email_type":1
+}
+参数说明：
+
+参数	必须	说明
+access_token	是	调用接口凭证，授权企业的token（通过获取企业凭证获取）或上游获取的下游企业的token（通过获取下级/下游企业的access_token获取）
+email	是	邮箱
+email_type	否	邮箱类型：1-企业邮箱（默认）；2-个人邮箱
+ 
+
+权限说明：
+
+应用须拥有指定成员的查看权限。
+
+返回结果：
+
+{
+	"errcode": 0,
+	"errmsg": "ok",
+	"userid": "zhangsan"
+}
+
+参数说明：
+
+参数	说明
+errcode	返回码
+errmsg	对返回码的文本描述内容
+userid	成员UserID。注意：已升级openid的代开发或第三方，获取的是密文userid
+更多说明：
+请确保邮箱的正确性，若出错的次数较多，会导致1天不可调用。
+     */
+    public function getUserIdByEmail($email, $email_type)
+    {
+        $params = array();
+        $params['email'] = $email;
+        $params['email_type'] = $email_type;
+        $rst = $this->_request->post($this->_url . 'get_userid_by_email', $params);
         return $this->_client->rst($rst);
     }
 }
