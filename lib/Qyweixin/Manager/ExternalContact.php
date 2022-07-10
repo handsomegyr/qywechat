@@ -9,6 +9,8 @@ use Qyweixin\Manager\ExternalContact\GroupMsg;
 use Qyweixin\Manager\ExternalContact\GroupChat;
 use Qyweixin\Manager\ExternalContact\ContactWay;
 use Qyweixin\Manager\ExternalContact\StrategyTag;
+use Qyweixin\Manager\ExternalContact\ProductAlbum;
+use Qyweixin\Manager\ExternalContact\InterceptRule;
 use Qyweixin\Manager\ExternalContact\MomentStrategy;
 use Qyweixin\Manager\ExternalContact\CustomerStrategy;
 use Qyweixin\Manager\ExternalContact\GroupWelcomeTemplate;
@@ -118,6 +120,26 @@ class ExternalContact
 	public function getMomentStrategyManager()
 	{
 		return new MomentStrategy($this->_client);
+	}
+
+	/**
+	 * 获取管理商品图册对象
+	 *
+	 * @return \Qyweixin\Manager\ExternalContact\ProductAlbum
+	 */
+	public function getProductAlbumManager()
+	{
+		return new ProductAlbum($this->_client);
+	}
+
+	/**
+	 * 获取管理聊天敏感词对象
+	 *
+	 * @return \Qyweixin\Manager\ExternalContact\InterceptRule
+	 */
+	public function getInterceptRuleManager()
+	{
+		return new InterceptRule($this->_client);
 	}
 
 	/**

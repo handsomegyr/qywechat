@@ -252,8 +252,75 @@ class Media
         $url = 'https://qyapi.weixin.qq.com/cgi-bin/media/get/jssdk?access_token=' . $accessToken . '&media_id=' . $mediaId;
         return $this->_request->getFileByUrl($url, $file_ext);
     }
+    
+    /**
+     * 上传附件资源
+素材上传得到media_id，该media_id仅三天内有效
+media_id在同一企业内应用之间可以共享
+请求方式：POST（HTTPS）
+请求地址：https://qyapi.weixin.qq.com/cgi-bin/media/upload_attachment?access_token=ACCESS_TOKEN&media_type=TYPE&attachment_type=1
 
-    public function __destruct()
+使用multipart/form-data POST上传文件， 文件标识名为"media"
+参数说明：
+
+参数	必须	说明
+access_token	是	调用接口凭证
+media_type	是	媒体文件类型，分别有图片（image）、视频（video）、普通文件（file）
+attachment_type	是	附件类型，不同的附件类型用于不同的场景。1：朋友圈；2:商品图册
+注：朋友圈附件类型：如果是客户端jsapi或者小程序接口使用，仅支持企业微信客户端版本在4.0.2及以上版本使用。不然可能显示异常。
+POST的请求包中，form-data中媒体文件标识，应包含有 filename、filelength、content-type等信息
+
+filename标识文件展示的名称。比如，使用该media_id发消息时，展示的文件名由该字段控制
+朋友圈附件类型，仅支持图片与视频
+请求示例：
+
+POST https://qyapi.weixin.qq.com/cgi-bin/media/upload_attachment?access_token=accesstoken001&media_type=TYPE&attachment_type=1  HTTP/1.1
+Content-Type: multipart/form-data; boundary=-------------------------acebdf13572468
+Content-Length: 220
+
+---------------------------acebdf13572468
+Content-Disposition: form-data; name="media";filename="wework.txt"; filelength=6
+Content-Type: application/octet-stream
+
+mytext
+---------------------------acebdf13572468--
+权限说明：
+支持客户联系系统应用调用；
+自建应用需配置在客户联系可调用应用；
+代开发自建应用/第三方应用需具备企业客户权限；
+
+返回数据：
+
+{
+   "errcode": 0,
+   "errmsg": ""，
+   "type": "image",
+   "media_id": "1G6nrLmr5EC3MMb_-zK1dDdzmd0p7cNliYu9V5w7o8K0",
+   "created_at": 1380000000
+}
+参数说明：
+
+参数	说明
+type	媒体文件类型，分别有图片（image）、语音（voice）、视频（video），普通文件(file)
+media_id	媒体文件上传后获取的唯一标识，三天有效，可使用获取临时素材接口获取
+created_at	媒体文件上传时间戳
+上传的媒体文件限制
+所有文件size必须大于5个字节
+
+图片（image）：10MB，支持JPG,PNG格式，朋友圈类型图片不超过1440 x 1080
+视频（video） ：10MB，支持MP4格式，朋友圈类型视频时长不超过30秒
+文件（file） ：10MB
+注：目前 商品图册只支持图片类型； 朋友圈只支持图片、视频类型
+     */
+    public function uploadAttachment($media_type, $attachment_type, $media)
     {
+        $query = array(
+            'media_type' => $media_type,
+            'attachment_type' => $attachment_type
+        );
+        $options = array(
+            'fieldName' => 'media'
+        );
+        return $this->_request->uploadFile('https://qyapi.weixin.qq.com/cgi-bin/media/upload_attachment', $media, $options, $query);
     }
 }

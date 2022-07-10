@@ -396,8 +396,7 @@ class GroupChat
      * {
      * "day_begin_time": 1572505490,
      * "owner_filter": {
-     * "userid_list": ["zhangsan"],
-     * "partyid_list": [7]
+     * "userid_list": ["zhangsan"]
      * },
      * "order_by": 2,
      * "order_asc": 0,
@@ -409,9 +408,9 @@ class GroupChat
      * 参数 必须 说明
      * access_token 是 调用接口凭证
      * day_begin_time 是 开始时间，填当天开始的0分0秒（否则系统自动处理为当天的0分0秒）。取值范围：昨天至前60天
-     * owner_filter 否 群主过滤，如果不填，表示获取全部群主的数据
-     * userid_list 否 群主ID列表。最多100个
-     * partyid_list 否 群主所属部门ID列表。最多100个
+     * day_end_time	否	结束日期的时间戳，填当天的0时0分0秒（否则系统自动处理为当天的0分0秒）。取值范围：昨天至前180天。如果不填，默认同 day_begin_time（即默认取一天的数据）
+     * owner_filter	是	群主过滤。如果不填，表示获取应用可见范围内全部群主的数据（但是不建议这么用，如果可见范围人数超过1000人，为了防止数据包过大，会报错 81017）
+     * owner_filter.userid_list	是	群主ID列表。最多100个
      * order_by 否 排序方式。
      * 1 - 新增群的数量
      * 2 - 群总数
@@ -464,10 +463,11 @@ class GroupChat
      * member_has_msg 截至当天有发过消息的群成员数
      * msg_total 截至当天客户群消息总数
      */
-    public function statistic($day_begin_time, $owner_filter, $order_by, $order_asc = 0, $offset = 0, $limit = 1000)
+    public function statistic($day_begin_time, $day_end_time, $owner_filter, $order_by, $order_asc = 0, $offset = 0, $limit = 1000)
     {
         $params = array();
         $params['day_begin_time'] = $day_begin_time;
+        $params['day_end_time'] = $day_end_time;
         $params['owner_filter'] = $owner_filter;
         $params['order_by'] = $order_by;
         $params['order_asc'] = $order_asc;
