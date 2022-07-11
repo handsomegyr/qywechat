@@ -186,6 +186,7 @@ class Department
 	 * "name": "广州研发中心",
 	 * "name_en": "RDGZ",
 	 * "parentid": 1,
+	 * "department_leader":["zhangsan","lisi"],
 	 * "order": 10
 	 * },
 	 * {
@@ -193,6 +194,7 @@ class Department
 	 * "name": "邮箱产品部",
 	 * "name_en": "mail",
 	 * "parentid": 2,
+	 * "department_leader":["zhangsan","lisi"],
 	 * "order": 40
 	 * }
 	 * ]
@@ -207,6 +209,7 @@ class Department
 	 * name 部门名称，此字段从2019年12月30日起，对新创建第三方应用不再返回，2020年6月30日起，对所有历史第三方应用不再返回，后续第三方仅通讯录应用可获取，第三方页面需要通过通讯录展示组件来展示部门名称
 	 * name_en 英文名称
 	 * parentid 父部门id。根部门为1
+	 * department_leader	部门负责人的UserID；第三方仅通讯录应用可获取
 	 * order 在父部门中的次序值。order值大的排序靠前。值范围是[0, 2^32)
 	 */
 	public function getDepartmentList($id = 0)
