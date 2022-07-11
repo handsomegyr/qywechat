@@ -15,11 +15,8 @@ class Agent
 
     // 接口地址
     private $_url = 'https://qyapi.weixin.qq.com/cgi-bin/agent/';
-
     private $_client;
-
     private $_request;
-
     public function __construct(Client $client)
     {
         $this->_client = $client;
@@ -67,7 +64,8 @@ class Agent
      * "redirect_domain": "open.work.weixin.qq.com",
      * "report_location_flag": 0,
      * "isreportenter": 0,
-     * "home_url": "https://open.work.weixin.qq.com"
+     * "home_url": "https://open.work.weixin.qq.com",
+     * "customized_publish_status":1
      * }
      * 参数说明：
      *
@@ -86,6 +84,7 @@ class Agent
      * report_location_flag 企业应用是否打开地理位置上报 0：不上报；1：进入会话上报；
      * isreportenter 是否上报用户进入应用事件。0：不接收；1：接收
      * home_url 应用主页url
+     * customized_publish_status 代开发自建应用返回该字段，表示代开发发布状态。0：待开发（企业已授权，服务商未创建应用）；1：开发中（服务商已创建应用，未上线）；2：已上线（服务商已上线应用且不存在未上线版本）；3：存在未上线版本（服务商已上线应用但存在未上线版本）
      */
     public function get($agentid)
     {

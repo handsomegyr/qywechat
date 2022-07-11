@@ -53,6 +53,17 @@ class Base extends \Qyweixin\Model\Base
      */
     public $duplicate_check_interval = NULL;
 
+    /** userids	否	企业的成员ID列表（最多支持1000个） */
+    public $userids = NULL;
+    /** partyids	否	企业的部门ID列表（最多支持100个） */
+    public $partyids = NULL;
+    /** tagids	否	企业的标签ID列表（最多支持100个） */
+    public $tagids = NULL;
+    /** atall	否	更新整个任务接收人员 */
+    public $atall = NULL;
+    /**response_code	是	更新卡片所需要消费的code，可通过发消息接口和回调接口返回值获取，一个code只能调用一次该接口，且只能在24小时内调用 */
+    public $response_code = NULL;
+
     public function getParams()
     {
         $params = array();
@@ -85,6 +96,21 @@ class Base extends \Qyweixin\Model\Base
             $params['duplicate_check_interval'] = $this->duplicate_check_interval;
         }
 
+        if ($this->isNotNull($this->userids)) {
+            $params['userids'] = $this->userids;
+        }
+        if ($this->isNotNull($this->partyids)) {
+            $params['partyids'] = $this->partyids;
+        }
+        if ($this->isNotNull($this->tagids)) {
+            $params['tagids'] = $this->tagids;
+        }
+        if ($this->isNotNull($this->atall)) {
+            $params['atall'] = $this->atall;
+        }
+        if ($this->isNotNull($this->response_code)) {
+            $params['response_code'] = $this->response_code;
+        }
         return $params;
     }
 }

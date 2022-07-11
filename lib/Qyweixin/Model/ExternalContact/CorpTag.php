@@ -36,10 +36,14 @@ class CorpTag extends \Qyweixin\Model\Base
      */
     public $agentid = NULL;
 
-    public function __construct(array $tag)
-    {
-        $this->tag = $tag;
-    }
+    /**
+     * id	是	标签或标签组的id
+     */
+    public $id = NULL;
+    /**
+     * name	否	新的标签或标签组名称，最长为30个字符
+     */
+    public $name = NULL;
 
     public function getParams()
     {
@@ -59,6 +63,12 @@ class CorpTag extends \Qyweixin\Model\Base
         }
         if ($this->isNotNull($this->agentid)) {
             $params['agentid'] = $this->agentid;
+        }
+        if ($this->isNotNull($this->id)) {
+            $params['id'] = $this->id;
+        }
+        if ($this->isNotNull($this->name)) {
+            $params['name'] = $this->name;
         }
         return $params;
     }
