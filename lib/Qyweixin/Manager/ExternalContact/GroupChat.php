@@ -476,4 +476,100 @@ class GroupChat
 		$rst = $this->_request->post($this->_url . 'statistic', $params);
 		return $this->_client->rst($rst);
 	}
+
+	/**
+	 * 按自然日聚合的方式
+	 *
+	 * 请求方式：POST（HTTPS）
+	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/externalcontact/groupchat/statistic_group_by_day?access_token=ACCESS_TOKEN
+	 *
+	 * {
+	 * "day_begin_time": 1600272000,
+	 * "day_end_time": 1600358400,
+	 * "owner_filter": {
+	 * "userid_list": ["zhangsan"]
+	 * }
+	 * }
+	 *
+	 * 参数说明：
+	 * 参数 必须 说明
+	 * access_token 是 调用接口凭证
+	 * day_begin_time 是 起始日期的时间戳，填当天的0时0分0秒（否则系统自动处理为当天的0分0秒）。取值范围：昨天至前180天。
+	 * day_end_time 否 结束日期的时间戳，填当天的0时0分0秒（否则系统自动处理为当天的0分0秒）。取值范围：昨天至前180天。
+	 * 如果不填，默认同 day_begin_time（即默认取一天的数据）
+	 * owner_filter 是 群主过滤。
+	 * 如果不填，表示获取应用可见范围内全部群主的数据（但是不建议这么用，如果可见范围人数超过1000人，为了防止数据包过大，会报错 81017）
+	 * owner_filter.userid_list 是 群主ID列表。最多100个
+	 *
+	 * 此接口查询的时间范围为 [day_begin_time, day_end_time]，前后均为闭区间（即包含day_end_time当天的数据），支持的最大查询跨度为30天；
+	 * 用户最多可获取最近180天内的数据（超过180天企业微信将不再存储）；
+	 * 当传入的时间不为0点时，会向下取整，如传入1554296400(Wed Apr 3 21:00:00 CST 2019)会被自动转换为1554220800（Wed Apr 3 00:00:00 CST 2019）;
+	 *
+	 * 权限说明:
+	 *
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+	 * 第三方应用使用，需具有“企业客户权限->客户群->获取客户群的数据统计”权限。
+	 * 对于第三方/自建应用，群主必须在应用的可见范围。
+	 *
+	 *
+	 *
+	 * 返回结果：
+	 *
+	 * {
+	 * "errcode": 0,
+	 * "errmsg": "ok",
+	 * "items": [{
+	 * "stat_time": 1600272000,
+	 * "data": {
+	 * "new_chat_cnt": 2,
+	 * "chat_total": 2,
+	 * "chat_has_msg": 0,
+	 * "new_member_cnt": 0,
+	 * "member_total": 6,
+	 * "member_has_msg": 0,
+	 * "msg_total": 0,
+	 * "migrate_trainee_chat_cnt": 3
+	 * }
+	 * },
+	 * {
+	 * "stat_time": 1600358400,
+	 * "data": {
+	 * "new_chat_cnt": 2,
+	 * "chat_total": 2,
+	 * "chat_has_msg": 0,
+	 * "new_member_cnt": 0,
+	 * "member_total": 6,
+	 * "member_has_msg": 0,
+	 * "msg_total": 0,
+	 * "migrate_trainee_chat_cnt": 3
+	 * }
+	 * }
+	 * ]
+	 * }
+	 *
+	 * 参数说明：
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * items 记录列表。表示某个自然日客户群的统计数据
+	 * items.stat_time 数据日期，为当日0点的时间戳
+	 * items.data 详情
+	 * items.data.new_chat_cnt 新增客户群数量
+	 * items.data.chat_total 截至当天客户群总数量
+	 * items.data.chat_has_msg 截至当天有发过消息的客户群数量
+	 * items.data.new_member_cnt 客户群新增群人数。
+	 * items.data.member_total 截至当天客户群总人数
+	 * items.data.member_has_msg 截至当天有发过消息的群成员数
+	 * items.data.msg_total 截至当天客户群消息总数
+	 * items.data.migrate_trainee_chat_cnt 截至当天新增迁移群数(仅教培行业返回)
+	 */
+	public function statisticGroupByDay($day_begin_time, $day_end_time, $owner_filter)
+	{
+		$params = array();
+		$params['day_begin_time'] = $day_begin_time;
+		$params['day_end_time'] = $day_end_time;
+		$params['owner_filter'] = $owner_filter;
+		$rst = $this->_request->post($this->_url . 'statistic_group_by_day', $params);
+		return $this->_client->rst($rst);
+	}
 }
