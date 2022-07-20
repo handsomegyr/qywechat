@@ -1644,7 +1644,9 @@ class ExternalContact
 	public function getUnassignedList($page_id = 0, $page_size = 1000, $cursor = "")
 	{
 		$params = array();
-		$params['page_id'] = $page_id;
+		if (!is_null($page_id)) {
+			$params['page_id'] = $page_id;
+		}
 		$params['page_size'] = $page_size;
 		$params['cursor'] = $cursor;
 		$rst = $this->_request->post($this->_url . 'get_unassigned_list', $params);
