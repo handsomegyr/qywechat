@@ -29,9 +29,9 @@ class ProductAlbum extends \Qyweixin\Model\Base
 
     /**
      * attachments	是	附件类型，仅支持image，最多不超过9个附件
+     * @var array(\Qyweixin\Model\ExternalContact\ProductAlbum\Attachment\Image)
      */
     public $attachments = NULL;
-
 
     public function getParams()
     {

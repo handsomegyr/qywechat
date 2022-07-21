@@ -82,7 +82,7 @@ class ProductAlbum
 	 * product_list.attachments.type 附件类型，目前仅支持image
 	 * product_list.image.media_id 图片的media_id，可以通过获取临时素材下载资源
 	 */
-	public function getList($cursor = "", $limit = 1000)
+	public function getList($cursor = "", $limit = 100)
 	{
 		$params['cursor'] = $cursor;
 		$params['limit'] = $limit;
