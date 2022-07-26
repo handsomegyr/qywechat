@@ -20,7 +20,7 @@ class Tag extends \Qyweixin\Model\Base
 
     public function __construct($tagname)
     {
-        $this->name = $tagname;
+        $this->tagname = $tagname;
     }
 
     public function getParams()
