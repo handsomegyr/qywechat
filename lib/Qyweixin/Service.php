@@ -96,7 +96,7 @@ class Service
         $params['corpid'] = $corpid;
         $params['provider_secret'] = $provider_secret;
         $rst = $this->_request->post($this->_url . 'get_provider_token', $params);
-        return $this->_client->rst($rst);
+        return $rst;
     }
 
     /**
@@ -989,7 +989,7 @@ class Service
         $params['allow_tag'] = $allow_tag;
 
         $rst = $this->_request->post('https://qyapi.weixin.qq.com/cgi-bin/agent/set_scope?access_token=' . $access_token, $params);
-        return $this->_client->rst($rst);
+        return $rst;
     }
 
     /**
@@ -1014,6 +1014,6 @@ class Service
     {
         $params = array();
         $rst = $this->_request->get('https://qyapi.weixin.qq.com/cgi-bin/sync/contact_sync_success?access_token=' . $access_token, $params);
-        return $this->_client->rst($rst);
+        return $rst;
     }
 }
