@@ -47,9 +47,8 @@ class JoinWay extends \Qyweixin\Model\Base
      */
     public $chat_id_list = NULL;
 
-    public function __construct($type, $scene)
+    public function __construct($scene)
     {
-        $this->type = $type;
         $this->scene = $scene;
     }
 
