@@ -183,8 +183,10 @@ class Service
      */
     public function getPreAuthCode($suite_access_token)
     {
-        $params = array();
-        $rst = $this->_request->get($this->_url . 'get_pre_auth_code?suite_access_token=' . $suite_access_token, $params);
+        $params = array(
+            'suite_access_token' => $suite_access_token
+        );
+        $rst = $this->_request->get($this->_url . 'get_pre_auth_code', $params);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
             throw new \Exception($rst['errmsg'], $rst['errcode']);
@@ -236,7 +238,10 @@ class Service
             'pre_auth_code' => $pre_auth_code,
             'session_info' => $session_info
         );
-        $rst = $this->_request->post($this->_url . 'set_session_info?suite_access_token=' . $suite_access_token, $params);
+        $queryParams = array(
+            'suite_access_token' => $suite_access_token
+        );
+        $rst = $this->_request->post($this->_url . 'set_session_info', $params, array(), '', $queryParams);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
             throw new \Exception($rst['errmsg'], $rst['errcode']);
@@ -373,7 +378,10 @@ class Service
         $params = array(
             'auth_code' => $auth_code
         );
-        $rst = $this->_request->post($this->_url . 'get_permanent_code?suite_access_token=' . $suite_access_token, $params);
+        $queryParams = array(
+            'suite_access_token' => $suite_access_token
+        );
+        $rst = $this->_request->post($this->_url . 'get_permanent_code', $params, array(), "", $queryParams);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
             throw new \Exception($rst['errmsg'], $rst['errcode']);
@@ -497,7 +505,10 @@ class Service
             'auth_corpid' => $auth_corpid,
             'permanent_code' => $permanent_code
         );
-        $rst = $this->_request->post($this->_url . 'get_auth_info?suite_access_token=' . $suite_access_token, $params);
+        $queryParams = array(
+            'suite_access_token' => $suite_access_token
+        );
+        $rst = $this->_request->post($this->_url . 'get_auth_info', $params, array(), '', $queryParams);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
             throw new \Exception($rst['errmsg'], $rst['errcode']);
@@ -549,7 +560,10 @@ class Service
             'auth_corpid' => $auth_corpid,
             'permanent_code' => $permanent_code
         );
-        $rst = $this->_request->post($this->_url . 'get_corp_token?suite_access_token=' . $suite_access_token, $params);
+        $queryParams = array(
+            'suite_access_token' => $suite_access_token
+        );
+        $rst = $this->_request->post($this->_url . 'get_corp_token', $params, array(), '', $queryParams);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
             throw new \Exception($rst['errmsg'], $rst['errcode']);
@@ -603,7 +617,10 @@ class Service
             'auth_corpid' => $auth_corpid,
             'agentid' => $agentid
         );
-        $rst = $this->_request->post($this->_url . 'get_admin_list?suite_access_token=' . $suite_access_token, $params);
+        $queryParams = array(
+            'suite_access_token' => $suite_access_token
+        );
+        $rst = $this->_request->post($this->_url . 'get_admin_list', $params, array(), '', $queryParams);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
             throw new \Exception($rst['errmsg'], $rst['errcode']);
@@ -765,7 +782,10 @@ class Service
         $params = array(
             'user_ticket' => $user_ticket
         );
-        $rst = $this->_request->post($this->_url . 'getuserdetail3rd?access_token=' . $suite_access_token, $params);
+        $queryParams = array(
+            'suite_access_token' => $suite_access_token
+        );
+        $rst = $this->_request->post($this->_url . 'getuserdetail3rd', $params, array(), '', $queryParams);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
             throw new \Exception($rst['errmsg'], $rst['errcode']);
