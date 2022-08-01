@@ -15,7 +15,7 @@ class ServiceSns
 
     private $_redirect_uri = "";
 
-    private $_scope = 'snsapi_userinfo';
+    private $_scope = 'snsapi_base';
 
     private $_state = '';
 

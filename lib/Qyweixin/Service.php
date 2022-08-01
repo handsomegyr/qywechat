@@ -25,9 +25,7 @@ class Service
 {
     // 接口地址
     private $_url = 'https://qyapi.weixin.qq.com/cgi-bin/service/';
-
     protected $_request = null;
-
     public function __construct()
     {
         $this->_request = $this->getRequest();
@@ -629,6 +627,119 @@ class Service
         }
     }
 
+    /**
+     * 获取应用二维码
+     * 用于获取第三方应用二维码。
+     *
+     * 请求方式：POST（HTTPS）
+     * 请求地址： https://qyapi.weixin.qq.com/cgi-bin/service/get_app_qrcode?suite_access_token=SUITE_ACCESS_TOKEN
+     *
+     * 请求包体：
+     *
+     * {
+     * "suite_id":"xxx",
+     * "appid":1,
+     * "state":"test",
+     * "style":0,
+     * "result_type":1
+     * }
+     * 参数说明：
+     *
+     * 参数 是否必须 说明
+     * suite_access_token 是 第三方应用access_token，获取方法参见 获取第三方应用凭证
+     * suite_id 是 第三方应用id（即ww或wx开头的suiteid）
+     * appid 否 第三方应用id，单应用不需要该参数，多应用旧套件才需要传该参数。若不传默认为1
+     * state 否 state值，用于区分不同的安装渠道，可以填写a-zA-Z0-9，长度不可超过32个字节，默认为空。扫应用带参二维码授权安装后，获取企业永久授权码接口会返回该state值
+     * style 否 二维码样式选项，默认为不带说明外框小尺寸。0：带说明外框的二维码，适合于实体物料，1：带说明外框的二维码，适合于屏幕类，2：不带说明外框（小尺寸），3：不带说明外框（中尺寸），4：不带说明外框（大尺寸）。具体样式与服务商管理端获取到的应用二维码样式一一对应，参见下文二维码样式说明
+     * result_type 否 结果返回方式，默认为返回二维码图片buffer。1：二维码图片buffer，2：二维码图片url
+     *
+     *
+     * 权限说明：
+     * 要求第三方应用是已上线的第三方通用应用
+     *
+     * 返回结果：
+     * result_type为1时返回二维码图片buffer（和普通的http下载相同，请根据http头做相应的处理）：
+     *
+     * HTTP/1.1 200 OK
+     * Connection: close
+     * Content-Type: image/png
+     * Content-disposition: attachment; filename="qrcode.png"
+     * Date: Sun, 06 Jan 2013 10:20:18 GMT
+     * Cache-Control: no-cache, must-revalidate
+     * Content-Length: 339721
+     *
+     * Xxxx
+     * result_type为2时用json格式返回图片url
+     *
+     * {
+     * "errcode":0 ,
+     * "errmsg":"ok" ,
+     * "qrcode":"xxxxx",
+     * }
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 错误码
+     * errmsg 错误描述
+     * qrcode 二维码url地址
+     */
+    public function getAppQrcode($suite_access_token, $suite_id, $appid, $state, $style, $result_type)
+    {
+        $params = array(
+            'suite_id' => $suite_id,
+            'appid' => $appid,
+            'state' => $state,
+            'style' => $style,
+            'result_type' => $result_type
+        );
+        $queryParams = array(
+            'suite_access_token' => $suite_access_token
+        );
+        $rst = $this->_request->post($this->_url . 'get_app_qrcode', $params, array(), '', $queryParams);
+        if (!empty($rst['errcode'])) {
+            // 如果有异常，会在errcode 和errmsg 描述出来。
+            throw new \Exception($rst['errmsg'], $rst['errcode']);
+        } else {
+            return $rst;
+        }
+    }
+
+    /**
+     * 明文corpid转换为加密corpid
+     * 为更好地保护企业与用户的数据，第三方应用获取的corpid不再是明文的corpid，将升级为第三方服务商级别的加密corpid（了解更多）。第三方可以将已有的明文corpid转换为第三方的加密corpid。
+     *
+     * 请求方式：POST（HTTPS）
+     * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/service/corpid_to_opencorpid?provider_access_token=ACCESS_TOKEN
+     *
+     * 请求参数：
+     *
+     * {
+     * "corpid":"xxxxx"
+     * }
+     * 参数说明：
+     *
+     * 参数 必须 说明
+     * provider_access_token 是 应用服务商的provider_access_token，获取方法参见服务商的凭证
+     * corpid 是 待获取的企业ID
+     *
+     *
+     * 权限说明：
+     *
+     * 仅限第三方服务商，转换已获授权企业的corpid
+     * 返回结果：
+     *
+     * ｛
+     * "errcode":0,
+     * "errmsg":"ok",
+     * "open_corpid":"AAAAAA"
+     * ｝
+     * 参数说明：
+     *
+     * 参数 说明
+     * errcode 返回码
+     * errmsg 对返回码的文本描述内容
+     * open_corpid 该服务商第三方应用下的企业ID
+     */
     /**
      * https://work.weixin.qq.com/api/doc/90001/90143/90597
      * 引导用户进入授权页
