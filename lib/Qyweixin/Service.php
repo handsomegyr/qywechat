@@ -740,6 +740,26 @@ class Service
      * errmsg 对返回码的文本描述内容
      * open_corpid 该服务商第三方应用下的企业ID
      */
+
+    public function corpidToOpenCorpid($provider_access_token, $corpid)
+    {
+        if (empty($corpid)) {
+            throw new \Exception('corpid不能为空');
+        }
+        $params = array();
+        $params['corpid'] = $corpid;
+        $queryParams = array(
+            'provider_access_token' => $provider_access_token
+        );
+        $rst = $this->_request->post($this->_url . "corpid_to_opencorpid", $params, array(), '', $queryParams);
+        if (!empty($rst['errcode'])) {
+            // 如果有异常，会在errcode 和errmsg 描述出来。
+            throw new \Exception($rst['errmsg'], $rst['errcode']);
+        } else {
+            return $rst;
+        }
+    }
+
     /**
      * https://work.weixin.qq.com/api/doc/90001/90143/90597
      * 引导用户进入授权页
@@ -832,8 +852,11 @@ class Service
         if (empty($code)) {
             throw new \Exception('code不能为空');
         }
-        $params = array();
-        $rst = $this->_request->get($this->_url . "getuserinfo3rd?access_token={$suite_access_token}&code={$code}", $params);
+        $params = array(
+            'access_token' => $suite_access_token,
+            'code' => $code
+        );
+        $rst = $this->_request->get($this->_url . "getuserinfo3rd", $params);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
             throw new \Exception($rst['errmsg'], $rst['errcode']);
