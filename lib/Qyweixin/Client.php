@@ -31,6 +31,7 @@ use Qyweixin\Manager\Health;
 use Qyweixin\Manager\Linkedcorp;
 use Qyweixin\Manager\Kf;
 use Qyweixin\Manager\Export;
+use Qyweixin\Manager\License;
 
 class Client
 {
@@ -363,6 +364,16 @@ class Client
     public function getExportManager()
     {
         return new Export($this);
+    }
+
+    /**
+     * 获取接口调用许可管理器
+     *
+     * @return \Qyweixin\Manager\License
+     */
+    public function getLicenseManager()
+    {
+        return new License($this);
     }
 
     /**
