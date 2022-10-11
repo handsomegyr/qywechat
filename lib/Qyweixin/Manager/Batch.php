@@ -27,6 +27,65 @@ class Batch
 	}
 
 	/**
+	 * 邀请成员
+	 * 调试工具
+	 * 企业可通过接口批量邀请成员使用企业微信，邀请后将通过短信或邮件下发通知。
+	 *
+	 * 请求方式：POST（HTTPS）
+	 * 请求地址： https://qyapi.weixin.qq.com/cgi-bin/batch/invite?access_token=ACCESS_TOKEN
+	 *
+	 * 请求示例：
+	 *
+	 * {
+	 * "user" : ["UserID1", "UserID2", "UserID3"],
+	 * "party" : [PartyID1, PartyID2],
+	 * "tag" : [TagID1, TagID2]
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 是否必须 说明
+	 * access_token 是 调用接口凭证
+	 * user 否 成员ID列表, 最多支持1000个。
+	 * party 否 部门ID列表，最多支持100个。
+	 * tag 否 标签ID列表，最多支持100个。
+	 * 权限说明：
+	 * 须拥有指定成员、部门或标签的查看权限。
+	 *
+	 * 返回示例：
+	 *
+	 * {
+	 * "errcode" : 0,
+	 * "errmsg" : "ok",
+	 * "invaliduser" : ["UserID1", "UserID2"],
+	 * "invalidparty" : [PartyID1, PartyID2],
+	 * "invalidtag": [TagID1, TagID2]
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * invaliduser 非法成员列表
+	 * invalidparty 非法部门列表
+	 * invalidtag 非法标签列表
+	 * 更多说明：
+	 *
+	 * user, party, tag三者不能同时为空；
+	 * 如果部分接收人无权限或不存在，邀请仍然执行，但会返回无效的部分（即invaliduser或invalidparty或invalidtag）;
+	 * 同一用户只须邀请一次，被邀请的用户如果未安装企业微信，在3天内每天会收到一次通知，最多持续3天。
+	 * 因为邀请频率是异步检查的，所以调用接口返回成功，并不代表接收者一定能收到邀请消息（可能受上述频率限制无法接收）。
+	 */
+	public function invite(array $user, array $party, array $tag)
+	{
+		$params = array();
+		$params['user'] = $user;
+		$params['party'] = $party;
+		$params['tag'] = $tag;
+		$rst = $this->_request->post($this->_url . 'invite', $params);
+		return $this->_client->rst($rst);
+	}
+
+	/**
 	 * 增量更新成员
 	 * 调试工具
 	 * 本接口以userid（帐号）为主键，增量更新企业微信通讯录成员。请先下载CSV模板(下载增量更新成员模版)，根据需求填写文件内容。
@@ -362,6 +421,60 @@ class Batch
 		$params['open_userid_list'] = $open_userid_list;
 		$params['source_agentid'] = $source_agentid;
 		$rst = $this->_request->post($this->_url . 'openuserid_to_userid', $params);
+		return $this->_client->rst($rst);
+	}
+	/**
+	 * userid的转换
+	 * 最后更新：2022/09/21
+	 * 将企业主体下的明文userid转换为服务商主体下的密文userid。
+	 *
+	 * 请求方式：POST（HTTPS）
+	 * 请求地址：https://qyapi.weixin.qq.com/cgi-bin/batch/userid_to_openuserid?access_token=ACCESS_TOKEN
+	 *
+	 * 请求参数：
+	 *
+	 * {
+	 * "userid_list":["aaa", "bbb"]
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 必须 说明
+	 * access_token 是 代开发自建应用或第三方应用的接口凭证，服务商可通过“获取企业access_token”获得此调用凭证
+	 * userid_list 是 获取到的成员ID列表，最多不超过1000个
+	 *
+	 *
+	 * 权限说明：
+	 *
+	 * 仅代开发应用或第三方应用可调用
+	 * 成员需要在应用的可见范围内
+	 * 请确保传入userid的正确性，若出错的次数较多，会导致1天不可调用，（具体限制阈值由授权企业的员工规模决定）。
+	 * 返回结果：
+	 *
+	 * {
+	 * "errcode": 0,
+	 * "errmsg": "",
+	 * "open_userid_list": [
+	 * {
+	 * "userid": "aaa",
+	 * "open_userid": "xxxxx",
+	 * }
+	 * ],
+	 * "invalid_userid_list":["bbb"]
+	 * }
+	 * 参数说明：
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * open_userid_list 该服务商主体下的密文userid
+	 * open_userid_list.userid 转换成功的userid
+	 * open_userid_list.open_userid 转换成功的userid对应的服务商主体下的密文userid
+	 */
+	public function useridToOpenuserid($userid_list)
+	{
+		$params = array();
+		$params['userid_list'] = $userid_list;
+		$rst = $this->_request->post($this->_url . 'userid_to_openuserid', $params);
 		return $this->_client->rst($rst);
 	}
 }

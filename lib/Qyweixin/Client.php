@@ -32,6 +32,8 @@ use Qyweixin\Manager\Linkedcorp;
 use Qyweixin\Manager\Kf;
 use Qyweixin\Manager\Export;
 use Qyweixin\Manager\License;
+use Qyweixin\Manager\Idconvert;
+use Qyweixin\Manager\Corp;
 
 class Client
 {
@@ -374,6 +376,26 @@ class Client
     public function getLicenseManager()
     {
         return new License($this);
+    }
+
+    /**
+     * 获取ID转换接口管理器
+     *
+     * @return \Qyweixin\Manager\Idconvert
+     */
+    public function getIdconvertManager()
+    {
+        return new Idconvert($this);
+    }
+
+    /**
+     * 获取Corp管理器
+     *
+     * @return \Qyweixin\Manager\Corp
+     */
+    public function getCorpManager()
+    {
+        return new Corp($this);
     }
 
     /**
