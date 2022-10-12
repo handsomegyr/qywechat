@@ -93,7 +93,7 @@ class GroupWelcomeTemplate extends \Qyweixin\Model\Base
         }
         if ($this->isNotNull($this->video)) {
             $linkParams = $this->video->getParams();
-            $params['video'] = $linkParams[$linkParams['video']];
+            $params['video'] = $linkParams[$linkParams['msgtype']];
         }
         if ($this->isNotNull($this->file)) {
             $linkParams = $this->file->getParams();
