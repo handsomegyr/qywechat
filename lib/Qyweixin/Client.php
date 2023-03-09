@@ -34,6 +34,7 @@ use Qyweixin\Manager\Export;
 use Qyweixin\Manager\License;
 use Qyweixin\Manager\Idconvert;
 use Qyweixin\Manager\Corp;
+use Qyweixin\Manager\Webhook;
 
 class Client
 {
@@ -396,6 +397,16 @@ class Client
     public function getCorpManager()
     {
         return new Corp($this);
+    }
+
+    /**
+     * 获取Webhook管理器
+     *
+     * @return \Qyweixin\Manager\Webhook
+     */
+    public function getWebhookManager()
+    {
+        return new Webhook($this);
     }
 
     /**

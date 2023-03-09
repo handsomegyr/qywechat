@@ -1,11 +1,11 @@
 <?php
 
-namespace Qyweixin\Model\AppchatMsg;
+namespace Qyweixin\Model\RobotMsg;
 
 /**
  * 文件消息构体
  */
-class File extends \Qyweixin\Model\AppchatMsg\Base
+class File extends \Qyweixin\Model\RobotMsg\Base
 {
     /**
      * msgtype 是 消息类型，此时固定为：file
@@ -13,13 +13,12 @@ class File extends \Qyweixin\Model\AppchatMsg\Base
     protected $msgtype = 'file';
 
     /**
-     * media_id 是 文件id，可以调用上传临时素材接口获取
+     * media_id 是 文件id，通过下文的文件上传接口获取
      */
     public $media_id = NULL;
 
-    public function __construct($chatid, $media_id)
+    public function __construct($media_id)
     {
-        $this->chatid = $chatid;
         $this->media_id = $media_id;
     }
 

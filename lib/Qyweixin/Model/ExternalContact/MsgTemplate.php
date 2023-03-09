@@ -29,6 +29,11 @@ class MsgTemplate extends \Qyweixin\Model\Base
      */
     public $text = NULL;
 
+    /**
+     * 是否允许成员在待发送客户列表中重新进行选择，默认为false
+     */
+    public $allow_select = NULL;
+
     // /**
     //  * image 图片
     //  *
@@ -76,6 +81,9 @@ class MsgTemplate extends \Qyweixin\Model\Base
         }
         if ($this->isNotNull($this->text)) {
             $params['text'] = $this->text->getParams();
+        }
+        if ($this->isNotNull($this->allow_select)) {
+            $params['allow_select'] = $this->allow_select;
         }
         if ($this->isNotNull($this->attachments)) {
             foreach ($this->attachments as $attachment) {
