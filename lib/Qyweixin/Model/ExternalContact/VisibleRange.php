@@ -20,11 +20,6 @@ class VisibleRange extends \Qyweixin\Model\Base
      */
     public $external_contact_list = NULL;
 
-    public function __construct($type)
-    {
-        $this->type = $type;
-    }
-
     public function getParams()
     {
         $params = array();
