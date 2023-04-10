@@ -797,6 +797,7 @@ class ExternalContact
 
 	/**
 	 * 添加企业群发消息任务
+	 * https://developer.work.weixin.qq.com/document/path/92135
 	 * 调试工具
 	 * 企业可通过此接口添加企业群发消息的任务并通知客服人员发送给相关客户或客户群。（注：企业微信终端需升级到2.7.5版本及以上）
 	 * 注意：调用该接口并不会直接发送消息给客户/客户群，需要相关的客服人员操作以后才会实际发送（客服人员的企业微信需要升级到2.7.5及以上版本）
@@ -891,6 +892,99 @@ class ExternalContact
 	{
 		$params = $msgTemplate->getParams();
 		$rst = $this->_request->post($this->_url . 'add_msg_template', $params);
+		return $this->_client->rst($rst);
+	}
+
+	/**
+	 * 提醒成员群发
+	 * https://developer.work.weixin.qq.com/document/path/97610
+	 * 最后更新：2022/11/30
+	 * 企业和第三方应用可调用此接口，重新触发群发通知，提醒成员完成群发任务，24小时内每个群发最多触发三次提醒。
+	 *
+	 * 请求方式:POST(HTTPS)
+	 *
+	 * 请求地址:https://qyapi.weixin.qq.com/cgi-bin/externalcontact/remind_groupmsg_send?access_token=ACCESS_TOKEN
+	 *
+	 * 请求示例
+	 *
+	 * {
+	 * "msgid": "msgGCAAAXtWyujaWJHDDGi0mACAAAA",
+	 * }
+	 * 参数说明:
+	 *
+	 * 参数 必须 说明
+	 * access_token 是 调用接口凭证
+	 * msgid 是 群发消息的id，通过获取群发记录列表接口返回
+	 *
+	 *
+	 * 权限说明:
+	 *
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+	 * 自建应用调用，只会返回应用可见范围内用户的发送情况。
+	 * 第三方应用调用需要企业授权客户联系下群发消息给客户和客户群的权限
+	 * 返回结果:
+	 *
+	 * {
+	 * "errcode": 0,
+	 * "errmsg": "ok"
+	 * }
+	 * 参数说明:
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 */
+	public function remindGroupmsgSend($msgid)
+	{
+		$params = array();
+		$params['msgid'] = $msgid;
+		$rst = $this->_request->post($this->_url . 'remind_groupmsg_send', $params);
+		return $this->_client->rst($rst);
+	}
+	/**
+	 * https://developer.work.weixin.qq.com/document/path/97611
+	 * 停止企业群发
+	 * 最后更新：2022/11/30
+	 * 企业和第三方应用可调用此接口，停止无需成员继续发送的企业群发
+	 * 请求方式:POST(HTTPS)
+	 *
+	 * 请求地址:https://qyapi.weixin.qq.com/cgi-bin/externalcontact/cancel_groupmsg_send?access_token=ACCESS_TOKEN
+	 *
+	 * 请求示例
+	 *
+	 * {
+	 * "msgid": "msgGCAAAXtWyujaWJHDDGi0mACAAAA",
+	 * }
+	 * 参数说明:
+	 *
+	 * 参数 必须 说明
+	 * access_token 是 调用接口凭证
+	 * msgid 是 群发消息的id，通过获取群发记录列表接口返回
+	 *
+	 *
+	 * 权限说明:
+	 *
+	 * 企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+	 * 自建应用调用，只会返回应用可见范围内用户的发送情况。
+	 * 第三方应用调用需要企业授权客户联系下群发消息给客户和客户群的权限
+	 * 返回结果:
+	 *
+	 * {
+	 * "errcode": 0,
+	 * "errmsg": "ok"
+	 * }
+	 * 参数说明:
+	 *
+	 * 参数 说明
+	 * errcode 返回码
+	 * errmsg 对返回码的文本描述内容
+	 * 注意，此接口无法撤回已经群发给客户的消息。
+	 */
+	public function cancelGroupmsgSend($msgid)
+	{
+		$params = array();
+		$params['msgid'] = $msgid;
+		$rst = $this->_request->post($this->_url . 'cancel_groupmsg_send', $params);
 		return $this->_client->rst($rst);
 	}
 
@@ -1860,7 +1954,6 @@ class ExternalContact
 		return $this->_client->rst($rst);
 	}
 
-	
 	/**
 	 * external_userid转换
 	 * 将代开发应用或第三方应用获取的externaluserid转换成自建应用的externaluserid。
