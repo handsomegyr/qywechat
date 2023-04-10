@@ -84,6 +84,7 @@ class ProductAlbum
 	 */
 	public function getList($cursor = "", $limit = 100)
 	{
+		$params = array();
 		$params['cursor'] = $cursor;
 		$params['limit'] = $limit;
 		$rst = $this->_request->post($this->_url . 'get_product_album_list', $params);
