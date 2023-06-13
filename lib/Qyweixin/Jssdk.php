@@ -4,6 +4,7 @@ namespace Qyweixin;
 
 use Qyweixin\Helpers;
 use Qyweixin\Http\Request;
+use Qyweixin\Model\Config;
 
 /**
  * 企业微信JSSDK https://work.weixin.qq.com/api/doc/90000/90136/90506
@@ -15,6 +16,14 @@ class Jssdk
     // 接口地址
     private $_url = 'https://qyapi.weixin.qq.com/cgi-bin/';
 
+    private $_config = null;
+    private $_client = null;
+
+    public function __construct(Config $conf = null)
+    {
+        $this->_config = $conf;
+        $this->_client = new Client(\uniqid(), \uniqid(), $this->_config);
+    }
     /**
      * 获取企业的jsapi_ticket
      * 生成签名之前必须先了解一下jsapi_ticket，jsapi_ticket是H5应用调用企业微信JS接口的临时票据。正常情况下，jsapi_ticket的有效期为7200秒，通过access_token来获取。由于获取jsapi_ticket的api调用次数非常有限（一小时内，一个企业最多可获取400次，且单个应用不能超过100次），频繁刷新jsapi_ticket会导致api调用受限，影响自身业务，开发者必须在自己的服务全局缓存jsapi_ticket。
@@ -47,6 +56,7 @@ class Jssdk
     {
         $params = array();
         $_request = new Request($access_token);
+        $_request->setClient($this->_client);
         $rst = $_request->get($this->_url . 'get_jsapi_ticket', $params);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。
@@ -89,6 +99,7 @@ class Jssdk
             'type' => 'agent_config'
         );
         $_request = new Request($access_token);
+        $_request->setClient($this->_client);
         $rst = $_request->get($this->_url . 'ticket/get', $params);
         if (!empty($rst['errcode'])) {
             // 如果有异常，会在errcode 和errmsg 描述出来。

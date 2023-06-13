@@ -163,10 +163,6 @@ class Pay
         return $this->certKey;
     }
 
-    public function __construct()
-    {
-    }
-
     /**
      * 发放企业红包
      * API接口协议
