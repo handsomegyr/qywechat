@@ -2,6 +2,10 @@
 
 namespace Qyweixin\Token;
 
+use Qyweixin\Client;
+use Qyweixin\Http\Request;
+use Qyweixin\Model\Config;
+
 /**
  * 网页授权登录 https://work.weixin.qq.com/api/doc/90000/90135/91020
  * 扫描授权登录 https://work.weixin.qq.com/api/doc/90000/90135/90988
@@ -16,8 +20,10 @@ class Sns
     private $_state = '';
     private $_agentid = '';
     private $_request;
-    private $_context;
-    public function __construct($appid, $secret)
+    private $_config = null;
+    private $_client = null;
+
+    public function __construct($appid, $secret, Config $conf = null)
     {
         if (empty($appid)) {
             throw new \Exception('请设定$appid');
@@ -28,22 +34,9 @@ class Sns
         $this->_state = uniqid();
         $this->_appid = $appid;
         $this->_secret = $secret;
-
-        $opts = array(
-            'http' => array(
-                'follow_location' => 3,
-                'max_redirects' => 3,
-                'timeout' => 10,
-                'method' => "GET",
-                'header' => "Connection: close\r\n",
-                'user_agent' => 'R&D'
-            ),
-            "ssl" => array(
-                "verify_peer" => false,
-                "verify_peer_name" => false
-            )
-        );
-        $this->_context = stream_context_create($opts);
+        $this->_config = $conf;
+        $this->_client = new Client($this->_appid, $this->_secret, $this->_config);
+        $this->_request = $this->_client->getRequest();
     }
 
     /**
@@ -216,10 +209,19 @@ class Sns
             throw new \Exception('code不能为空');
         }
         // https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=ACCESS_TOKEN&code=CODE
-        $response = file_get_contents("https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token={$access_token}&code={$code}", false, $this->_context);
-        $response = json_decode($response, true);
-
-        return $response;
+        $url = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token={$access_token}&code={$code}";
+        $params = array(
+            'access_token' => $access_token,
+            'code' => $code
+        );
+        $rst = $this->_request->get($url, $params);
+        return $rst;
+        // if (!empty($rst['errcode'])) {
+        //     // 如果有异常，会在errcode 和errmsg 描述出来。
+        //     throw new \Exception($rst['errmsg'], $rst['errcode']);
+        // } else {
+        //     return $rst;
+        // }
     }
 
     /**
@@ -279,32 +281,13 @@ class Sns
      */
     public function getUserDetail($access_token, $user_ticket)
     {
-        $data = array(
-            'user_ticket' => $user_ticket
-        );
-        $data = http_build_query($data);
-        $data = json_encode($data);
-        $opts = array(
-            'http' => array(
-                'follow_location' => 3,
-                'max_redirects' => 3,
-                'timeout' => 10,
-                'method' => "POST",
-                'content' => $data,
-                'header' => "Connection: close\r\n",
-                'user_agent' => 'R&D'
-            ),
-            "ssl" => array(
-                "verify_peer" => false,
-                "verify_peer_name" => false
-            )
-        );
-        $context = stream_context_create($opts);
         // https://qyapi.weixin.qq.com/cgi-bin/user/getuserdetail?access_token=ACCESS_TOKEN
-        $response = file_get_contents("https://qyapi.weixin.qq.com/cgi-bin/user/getuserdetail?access_token={$access_token}", false, $context);
-        $response = json_decode($response, true);
-
-        return $response;
+        $url = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserdetail?access_token={$access_token}";
+        $params = array();
+        $params['access_token'] = $access_token;
+        $params['user_ticket'] = $user_ticket;
+        $rst = $this->_request->post($url, $params);
+        return $rst;
     }
 
     /**

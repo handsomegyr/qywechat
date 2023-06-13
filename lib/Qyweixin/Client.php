@@ -9,35 +9,39 @@
 
 namespace Qyweixin;
 
-use Qyweixin\Manager\Agent;
-use Qyweixin\Manager\Appchat;
-use Qyweixin\Manager\Batch;
-use Qyweixin\Manager\Card;
-use Qyweixin\Manager\Checkin;
-use Qyweixin\Manager\Department;
-use Qyweixin\Manager\Dial;
-use Qyweixin\Manager\ExternalContact;
 use Qyweixin\Manager\Ip;
-use Qyweixin\Manager\Media;
-use Qyweixin\Manager\Menu;
-use Qyweixin\Manager\Message;
-use Qyweixin\Manager\Oa;
-use Qyweixin\Manager\Reply;
-use Qyweixin\Manager\Tag;
-use Qyweixin\Manager\User;
-use Qyweixin\Manager\MsgAudit;
-use Qyweixin\Manager\Living;
-use Qyweixin\Manager\Health;
-use Qyweixin\Manager\Linkedcorp;
 use Qyweixin\Manager\Kf;
-use Qyweixin\Manager\Export;
-use Qyweixin\Manager\License;
-use Qyweixin\Manager\Idconvert;
+use Qyweixin\Manager\Oa;
+use Qyweixin\Manager\Tag;
+use Qyweixin\Manager\Card;
 use Qyweixin\Manager\Corp;
+use Qyweixin\Manager\Dial;
+use Qyweixin\Manager\Menu;
+use Qyweixin\Manager\User;
+use Qyweixin\Model\Config;
+use Qyweixin\Manager\Agent;
+use Qyweixin\Manager\Batch;
+use Qyweixin\Manager\Media;
+use Qyweixin\Manager\Reply;
+use Qyweixin\Manager\Export;
+use Qyweixin\Manager\Health;
+use Qyweixin\Manager\Living;
+use Qyweixin\Manager\Appchat;
+use Qyweixin\Manager\Checkin;
+use Qyweixin\Manager\License;
+use Qyweixin\Manager\Message;
 use Qyweixin\Manager\Webhook;
+use Qyweixin\Manager\MsgAudit;
+use Qyweixin\Manager\Idconvert;
+use Qyweixin\Manager\Department;
+use Qyweixin\Manager\Linkedcorp;
+use Qyweixin\Manager\ExternalContact;
 
 class Client
 {
+
+    private $_from;
+    private $_to;
 
     private $_corpId;
 
@@ -47,10 +51,24 @@ class Client
 
     private $_accessToken = null;
 
-    public function __construct($corpId, $corpSecret)
+    private $_config = null;
+
+    public function __construct($corpId, $corpSecret, Config $conf = null)
     {
         $this->_corpId = $corpId;
         $this->_corpSecret = $corpSecret;
+        $this->_config = $conf;
+    }
+
+    public function getConfig()
+    {
+        return $this->_config;
+    }
+
+    public function setConfig(Config $conf)
+    {
+        $this->_config = $conf;
+        return $this;
     }
 
     public function getCorpId()
@@ -130,6 +148,7 @@ class Client
     private function initRequest()
     {
         $this->_request = new \Qyweixin\Http\Request($this->getAccessToken());
+        $this->_request->setClient($this);
     }
 
     /**

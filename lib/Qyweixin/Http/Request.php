@@ -9,9 +9,11 @@
 
 namespace Qyweixin\Http;
 
+use Qyweixin\Client;
+
 class Request
 {
-
+    protected $_isProxyUsed = null;
     protected $_accessToken = null;
 
     protected $_tmp = null;
@@ -20,11 +22,64 @@ class Request
 
     protected $_accessTokenName = 'access_token';
 
+    /**
+     * @var Client
+     */
+    protected $_client = null;
+
     public function __construct($accessToken = '', $json = true, $accessTokenName = 'access_token')
     {
         $this->setAccessTokenName($accessTokenName);
         $this->setAccessToken($accessToken);
         $this->setJson($json);
+    }
+
+    public function setClient(Client $client)
+    {
+        $this->_client = $client;
+        return $this;
+    }
+
+    public function setIsProxyUsed($_isProxyUsed)
+    {
+        $this->_isProxyUsed = $_isProxyUsed;
+        return $this;
+    }
+
+    public function getProxyConfig()
+    {
+        // 查看client
+        $errmsg = "";
+        $isProxyUsed = false;
+        $proxyUrl = '';
+        $config = null;
+        // 如果设置了client的话
+        if (!empty($this->_client)) {
+            $config = $this->_client->getConfig();
+            if (!empty($config)) {
+                $isProxyUsed = $config->getIsProxyUsed();
+                $proxyUrl = $config->getProxyUrl();
+            }
+        }
+
+        // 有设置过的话
+        if (!is_null($this->_isProxyUsed)) {
+            $isProxyUsed = $this->_isProxyUsed;
+        }
+        $isProxyUsed = empty($isProxyUsed) ? false : true;
+        // 如果使用代理的话
+        if (!empty($isProxyUsed)) {
+            // 但是没有设置代理地址的话就报错
+            if (empty($proxyUrl)) {
+                $isProxyUsed = false;
+                $errmsg = "未设置代理地址";
+            }
+        }
+        return array(
+            'isProxyUsed' => $isProxyUsed,
+            'proxyUrl' => $proxyUrl,
+            'errmsg' => $errmsg
+        );
     }
 
     /**
@@ -69,7 +124,9 @@ class Request
      */
     public function get($url, $params = array(), $options = array())
     {
-        $client = new \GuzzleHttp\Client($options);
+        $url = $this->replaceUrl($url);
+
+        $client = new \GuzzleHttp\Client($this->setClientOptions($options));
         $query = $this->getQueryParam4AccessToken();
         $params = array_merge($params, $query);
         $response = $client->get($url, array(
@@ -91,7 +148,9 @@ class Request
      */
     public function post($url, $params = array(), $options = array(), $body = '', array $queryParams = array())
     {
-        $client = new \GuzzleHttp\Client($options);
+        $url = $this->replaceUrl($url);
+
+        $client = new \GuzzleHttp\Client($this->setClientOptions($options));
         $query = $this->getQueryParam4AccessToken();
         if (!empty($queryParams)) {
             $query = array_merge($query, $queryParams);
@@ -120,7 +179,9 @@ class Request
      */
     public function uploadFile($url, $media, array $options = array('fieldName' => 'media'), array $otherQuery = array())
     {
-        $client = new \GuzzleHttp\Client();
+        $url = $this->replaceUrl($url);
+
+        $client = new \GuzzleHttp\Client($this->setClientOptions(array()));
         $query = $this->getQueryParam4AccessToken();
         if (!empty($otherQuery)) {
             $query = array_merge($query, $otherQuery);
@@ -164,7 +225,9 @@ class Request
      */
     public function uploadFiles($uri, array $fileParams, array $extraParams = array(), array $description = array())
     {
-        $client = new \GuzzleHttp\Client();
+        $uri = $this->replaceUrl($uri);
+
+        $client = new \GuzzleHttp\Client($this->setClientOptions(array()));
 
         $files = array();
         foreach ($fileParams as $fileName => $media) {
@@ -305,6 +368,39 @@ class Request
         return $params;
     }
 
+    protected function replaceUrl($url)
+    {
+        // 如果是使用代理的话
+        $proxyConfig = $this->getProxyConfig();
+        $isProxyUsed = $proxyConfig['isProxyUsed'];
+        $proxyUrl = $proxyConfig['proxyUrl'];
+        if ($isProxyUsed) {
+            $url = str_ireplace(
+                'https://qyapi.weixin.qq.com/',
+                $proxyUrl,
+                $url
+            );
+        }
+        // die('url:' . $url);
+        return $url;
+    }
+
+    protected function setClientOptions($options)
+    {
+        return $options;
+        // if (empty($options['headers'])) {
+        //     $options['headers'] = [
+        //         'CLIENT-IP' => '120.55.64.32',
+        //         'X-FORWARDED-FOR' => '120.55.64.32'
+        //     ];
+        // } else {
+        //     $options = array_merge($options['headers'], [
+        //         'CLIENT-IP' => '120.55.64.32',
+        //         'X-FORWARDED-FOR' => '120.55.64.32'
+        //     ]);
+        // }
+        // return $options;
+    }
     public function __destruct()
     {
         if (!empty($this->_tmp)) {

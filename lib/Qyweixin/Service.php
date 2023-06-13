@@ -17,15 +17,16 @@
 namespace Qyweixin;
 
 use Qyweixin\Http\Request;
-use Qyweixin\Manager\Service\Contact;
-use Qyweixin\Manager\Service\Media;
 use Qyweixin\Manager\Service\Batch;
+use Qyweixin\Manager\Service\Media;
+use Qyweixin\Manager\Service\Contact;
 
 class Service
 {
     // 接口地址
     private $_url = 'https://qyapi.weixin.qq.com/cgi-bin/service/';
     protected $_request = null;
+
     public function __construct()
     {
         $this->_request = $this->getRequest();
@@ -37,6 +38,8 @@ class Service
     protected function initRequest()
     {
         $this->_request = new Request();
+        // 不使用代理
+        $this->_request->setIsProxyUsed(false);
     }
 
     /**
