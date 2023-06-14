@@ -36,7 +36,6 @@ class Sns
         $this->_secret = $secret;
         $this->_config = $conf;
         $this->_client = new Client($this->_appid, $this->_secret, $this->_config);
-        $this->_request = $this->_client->getRequest();
     }
 
     /**
@@ -214,7 +213,9 @@ class Sns
             'access_token' => $access_token,
             'code' => $code
         );
-        $rst = $this->_request->get($url, $params);
+        $request = new \Qyweixin\Http\Request($access_token);
+        $request->setClient($this->_client);
+        $rst = $request->get($url, $params);
         return $rst;
         // if (!empty($rst['errcode'])) {
         //     // 如果有异常，会在errcode 和errmsg 描述出来。
@@ -286,7 +287,9 @@ class Sns
         $params = array();
         $params['access_token'] = $access_token;
         $params['user_ticket'] = $user_ticket;
-        $rst = $this->_request->post($url, $params);
+        $request = new \Qyweixin\Http\Request($access_token);
+        $request->setClient($this->_client);
+        $rst = $request->post($url, $params);
         return $rst;
     }
 
