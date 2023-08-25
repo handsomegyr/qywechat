@@ -31,6 +31,12 @@ class Link extends \Qyweixin\Model\Kf\Msg\MsgBase
      */
     public $thumb_media_id = NULL;
 
+
+    /**
+     * pic_url	string	否	缩略图链接
+     */
+    public $pic_url = NULL;
+
     public function __construct()
     {
     }
@@ -50,6 +56,9 @@ class Link extends \Qyweixin\Model\Kf\Msg\MsgBase
         }
         if ($this->isNotNull($this->thumb_media_id)) {
             $params[$this->msgtype]['thumb_media_id'] = $this->thumb_media_id;
+        }
+        if ($this->isNotNull($this->pic_url)) {
+            $params[$this->msgtype]['pic_url'] = $this->pic_url;
         }
         return $params;
     }

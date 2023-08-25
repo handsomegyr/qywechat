@@ -5,7 +5,7 @@ namespace Qyweixin\Model\Kf\Knowledge;
 /**
  * 回答列表构体
  */
-class Answers extends \Qyweixin\Model\Base
+class Answer extends \Qyweixin\Model\Base
 {
     /**
      * answers[].text	obj	是	回答文本
@@ -23,7 +23,7 @@ class Answers extends \Qyweixin\Model\Base
         $params = array();
 
         if ($this->isNotNull($this->text)) {
-            $params[] = $this->text->getParams();
+            $params = array_merge($params, $this->text->getParams());
         }
         if (!empty($this->attachments)) {
             foreach ($this->attachments as $info) {

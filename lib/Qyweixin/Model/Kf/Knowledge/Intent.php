@@ -31,7 +31,6 @@ class Intent extends \Qyweixin\Model\Base
 
     /**
      * answers	obj[]	是	回答列表。目前仅支持1个
-     * @var \Qyweixin\Model\Kf\Knowledge\Answers
      */
     public $answers = NULL;
 
@@ -51,8 +50,10 @@ class Intent extends \Qyweixin\Model\Base
         if ($this->isNotNull($this->similar_questions)) {
             $params['similar_questions'] = $this->similar_questions->getParams();
         }
-        if ($this->isNotNull($this->answers)) {
-            $params['answers'] = $this->answers->getParams();
+        if (!empty($this->answers)) {
+            foreach ($this->answers as $answer) {
+                $params['answers'][] = $answer->getParams();
+            }
         }
         return $params;
     }
