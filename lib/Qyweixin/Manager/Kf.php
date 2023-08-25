@@ -9,6 +9,7 @@ use Qyweixin\Manager\Kf\Servicer;
 use Qyweixin\Manager\Kf\ServiceState;
 use Qyweixin\Manager\Kf\Msg;
 use Qyweixin\Manager\Kf\Customer;
+use Qyweixin\Manager\Kf\Knowledge;
 
 /**
  * 微信客服
@@ -80,5 +81,15 @@ class Kf
     public function getCustomerManager()
     {
         return new Customer($this->_client);
+    }
+
+    /**
+     * 获取知识库管理对象
+     *
+     * @return \Qyweixin\Manager\Kf\Knowledge
+     */
+    public function getKnowledgeManager()
+    {
+        return new Knowledge($this->_client);
     }
 }
