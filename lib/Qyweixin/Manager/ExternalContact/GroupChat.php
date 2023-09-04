@@ -260,7 +260,7 @@ class GroupChat
 	{
 		$params = array();
 		$params['opengid'] = $opengid;
-		$rst = $this->_request->post($this->_url . 'opengid_to_chatid', $params);
+		$rst = $this->_request->post('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/opengid_to_chatid', $params);
 		return $this->_client->rst($rst);
 	}
 
