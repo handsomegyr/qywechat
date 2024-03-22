@@ -9,7 +9,7 @@ class Text extends \Qyweixin\Model\Base
 {
 
     /**
-     * text.content 消息文本内容,最长为4000字节
+     * text.content 消息文本内容，不能与附件同时为空，最多支持传入2000个字符，若超出长度报错'invalid text size'
      */
     public $content = NULL;
 
