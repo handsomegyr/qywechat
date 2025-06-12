@@ -8,8 +8,12 @@ namespace Qyweixin\Wx\Token;
 class Sns
 {
     private $_context;
+    private $_config;
 
-    public function __construct()
+    /**
+     * @param \Qyweixin\Model\Config
+     */
+    public function __construct($config = null)
     {
         $opts = array(
             'http' => array(
@@ -26,6 +30,7 @@ class Sns
             )
         );
         $this->_context = stream_context_create($opts);
+        $this->_config = $config;
     }
 
     /**
@@ -80,7 +85,14 @@ class Sns
         if (empty($js_code)) {
             throw new \Exception('js_code不能为空');
         }
-        $response = file_get_contents("https://qyapi.weixin.qq.com/cgi-bin/miniprogram/jscode2session?access_token={$access_token}&js_code={$js_code}&grant_type=authorization_code", false, $this->_context);
+
+        if (!empty($this->_config) && $this->_config->getIsProxyUsed()) {
+            $host = $this->_config->getProxyUrl();
+        } else {
+            $host = 'https://qyapi.weixin.qq.com/';
+        }
+
+        $response = file_get_contents($host . "cgi-bin/miniprogram/jscode2session?access_token={$access_token}&js_code={$js_code}&grant_type=authorization_code", false, $this->_context);
         $response = json_decode($response, true);
 
         return $response;
